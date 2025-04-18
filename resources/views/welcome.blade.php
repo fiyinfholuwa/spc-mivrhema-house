@@ -57,7 +57,7 @@
 <header id="site-header" class="site-header valign-center">
     <div class="intro">
 
-        <h2>June 7–10, 2025 / MIV Rhema House</h2>
+        <h2>June 6–9, 2025 / MIV Rhema House</h2>
 
         <h1>Sexual Purity Conference 2025</h1>
 
@@ -111,7 +111,7 @@
         <div class="row">
             <div class="col-sm-3">
                 <i class="ion-ios-calendar"></i>
-                <h3>2025<br>June 7–10</h3>
+                <h3>2025<br>June 6–9</h3>
             </div>
             <div class="col-sm-3">
                 <i class="ion-ios-location"></i>
