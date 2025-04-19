@@ -11,6 +11,8 @@
     <link rel="stylesheet" href="{{asset('frontend/bower_components/bootstrap/dist/css/bootstrap.min.css')}}">
     <link rel="stylesheet" href="{{asset('frontend/bower_components/ionicons/css/ionicons.min.css')}}">
     <link rel="stylesheet" href="{{asset('frontend/assets/css/main.css')}}">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" rel="stylesheet" />
+
 </head>
 <body data-spy="scroll" data-target="#site-nav">
 <nav id="site-nav" class="navbar navbar-fixed-top navbar-custom">
@@ -43,11 +45,17 @@
                 <!-- navigation menu -->
                 <li class="active"><a data-scroll href="#about">About</a></li>
 {{--                <li><a data-scroll href="#speakers">Speakers</a></li>--}}
-{{--                <li><a data-scroll href="#schedule">Schedule</a></li>--}}
+                <li><a data-scroll href="#registration">Book A Seat</a></li>
                 <li><a data-scroll href="#partner">Partner</a></li>
                 <!-- <li><a data-scroll href="#">Sponsorship</a></li> -->
                 <li><a data-scroll href="#faq">FAQ</a></li>
-{{--                <li><a data-scroll href="#photos">Photos</a></li>--}}
+                @auth
+                    <li><a  href="{{route('dashboard')}}">Dashboard</a></li>
+
+                @else
+                    <li><a href="{{route('login')}}">Login</a></li>
+
+                @endauth
 
             </ul>
         </div>
@@ -158,7 +166,6 @@
                             <option value="">Select Gender</option>
                             <option value="male">Male</option>
                             <option value="female">Female</option>
-                            <option value="prefer-not-to-say">Prefer not to say</option>
                         </select>
                     </div>
 
@@ -211,8 +218,9 @@
 
                     <div class="form-group" id="group-details" style="display:none;">
                         <label>If "Group", please state your group name and number of participants:</label>
-                        <input type="text" class="form-control" name="group_name" placeholder="Group Name">
-                        <input type="number" class="form-control" name="group_size" placeholder="Number of Participants">
+
+                        <input   type="text" class="form-control" name="group_name" placeholder="Group Name">
+                        <input style="margin-top: 10px;"  type="number" class="form-control" name="group_size" placeholder="Number of Participants">
                     </div>
                 </div>
             </div>
@@ -277,42 +285,68 @@
 
 <section id="partner" class="section partner">
     <div class="container">
-        <div class="row">
-            <div class="col-md-12">
-                <h3 class="section-title">Event Partner</h3>
+        <div class="row mb-4">
+            <div class="col-12 text-center">
+                <h3 class="section-title">Our Event Partners</h3>
             </div>
         </div>
-        <div class="row">
-            <div class="col-sm-3">
-                <a class="partner-box partner-box-1"></a>
+        <div class="row justify-content-between align-items-center">
+            <div class="col-6 col-md-6 text-center mb-4 mt-3">
+                <a href="#" class="partner-logo d-block">
+                    <img src="{{ asset('frontend/image/lst.png') }}" alt="Partner 1">
+                </a>
             </div>
-            <div class="col-sm-3">
-                <a class="partner-box partner-box-2"></a>
-            </div>
-            <div class="col-sm-3">
-                <a class="partner-box partner-box-3"></a>
-            </div>
-            <div class="col-sm-3">
-                <a class="partner-box partner-box-4"></a>
+            <div class="col-6 col-md-6 text-center mb-4 mt-3">
+                <a href="#" class="partner-logo d-block">
+                    <img src="{{ asset('frontend/image/rhema.jpg') }}" alt="Partner 2">
+                </a>
             </div>
         </div>
-
-        <div class="row">
-            <div class="col-sm-3">
-                <a class="partner-box partner-box-5"></a>
-            </div>
-            <div class="col-sm-3">
-                <a class="partner-box partner-box-6"></a>
-            </div>
-            <div class="col-sm-3">
-                <a class="partner-box partner-box-7"></a>
-            </div>
-            <div class="col-sm-3">
-                <a class="partner-box partner-box-8"></a>
-            </div>
-        </div>
+    </div>
 </section>
 
+<style>
+    #partner {
+        background-color: #f9f9f9;
+        padding: 60px 0;
+    }
+
+    .section-title {
+        font-size: 2rem;
+        font-weight: bold;
+        margin-bottom: 30px;
+        color: #333;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+
+    .partner-logo img {
+        width: 100%;
+        max-width: 100%;
+        height: auto;
+        max-height: 140px;
+        object-fit: contain;
+        transition: transform 0.3s ease, filter 0.3s ease;
+        filter: grayscale(100%);
+        border-radius: 10px;
+        box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+        margin-top: 40px;
+        padding: 20px;
+    }
+
+    .partner-logo:hover img {
+        transform: scale(1.05);
+        filter: grayscale(0%);
+        box-shadow: 0 12px 25px rgba(0,0,0,0.12);
+    }
+
+    @media (max-width: 767px) {
+        .partner-logo img {
+            max-height: 100px;
+        }
+    }
+
+</style>
 <section id="faq" class="section faq">
     <div class="container">
         <div class="row">
@@ -352,19 +386,19 @@
                         </div>
                     </div>
 
-                    <div class="panel panel-default">
-                        <div class="panel-heading" role="tab" id="headingThree">
-                            <h4 class="panel-title">
-                                <a class="faq-toggle collapsed" role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseThree" aria-expanded="false" aria-controls="collapseThree"> What is the office address?</a>
-                            </h4>
-                        </div>
+{{--                    <div class="panel panel-default">--}}
+{{--                        <div class="panel-heading" role="tab" id="headingThree">--}}
+{{--                            <h4 class="panel-title">--}}
+{{--                                <a class="faq-toggle collapsed" role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseThree" aria-expanded="false" aria-controls="collapseThree"> What is the office address?</a>--}}
+{{--                            </h4>--}}
+{{--                        </div>--}}
 
-                        <div id="collapseThree" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingThree">
-                            <div class="panel-body">
-                                <p>The Sexual Purity Conference is being held at the following address: <strong>123 Conference Center Avenue, Cityville, State, ZIP.</strong> We look forward to welcoming you to this inspiring location!</p>
-                            </div>
-                        </div>
-                    </div>
+{{--                        <div id="collapseThree" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingThree">--}}
+{{--                            <div class="panel-body">--}}
+{{--                                <p>The Sexual Purity Conference is being held at the following address: <strong>123 Conference Center Avenue, Cityville, State, ZIP.</strong> We look forward to welcoming you to this inspiring location!</p>--}}
+{{--                            </div>--}}
+{{--                        </div>--}}
+{{--                    </div>--}}
 
                     <div class="panel panel-default">
                         <div class="panel-heading" role="tab" id="headingFour">
@@ -389,7 +423,7 @@
 
                         <div id="collapseFive" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingFive">
                             <div class="panel-body">
-                                <p>If you have any further questions, feel free to contact our event support team at <strong>support@sexualpurityconference.com</strong>. We’ll be happy to assist you with any inquiries you have regarding the event or registration process.</p>
+                                <p>If you have any further questions, feel free to contact our event support team at <strong>mivrhemahouse@gmail.com</strong>. We’ll be happy to assist you with any inquiries you have regarding the event or registration process.</p>
                             </div>
                         </div>
                     </div>
@@ -423,5 +457,46 @@
 <script src="{{asset('frontend/bower_components/bootstrap/dist/js/bootstrap.min.js')}}"></script>
 <script src="{{asset('frontend/bower_components/smooth-scroll/dist/js/smooth-scroll.min.js')}}"></script>
 <script src="{{asset('frontend/assets/js/main.js')}}"></script>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+
+<script>
+    $('#registration-form').on('submit', function(e) {
+        e.preventDefault();
+        const formData = $(this).serialize();
+
+        $.ajax({
+            url: "{{ route('register.conference') }}",
+            method: "POST",
+            data: formData,
+            headers: {'X-CSRF-TOKEN': '{{ csrf_token() }}'},
+            success: function(res) {
+                toastr.success(res.message);
+                $('#registration-form')[0].reset();
+                $('#group-details').hide();
+            },
+            error: function(xhr) {
+                if (xhr.status === 422) {
+                    const errors = xhr.responseJSON.errors;
+                    for (const field in errors) {
+                        toastr.error(errors[field][0]);
+                    }
+                } else {
+                    toastr.error("Something went wrong. Try again.");
+                }
+            }
+        });
+    });
+
+    $('#registration_type').on('change', function() {
+        if ($(this).val() === 'group') {
+            $('#group-details').slideDown();
+        } else {
+            $('#group-details').slideUp();
+        }
+    });
+</script>
+
 </body>
 </html>
