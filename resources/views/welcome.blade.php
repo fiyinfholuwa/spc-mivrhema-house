@@ -304,7 +304,7 @@
 
             <div class="col-12 col-md-4 text-center mb-4 mt-3">
                 <a href="#" class="partner-logo d-block">
-                    <img src="https://www.google.com/url?sa=i&url=https%3A%2F%2Fmenofissacharvision.com%2F&psig=AOvVaw0qzdtSmRTP4NYgpFTGTPlj&ust=1745393880966000&source=images&cd=vfe&opi=89978449&ved=0CBQQjRxqFwoTCLi5xoOR64wDFQAAAAAdAAAAABAE" alt="Partner 2">
+                    <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSgKIcYujg3-v8XqMxPpS4rtzuH0wXgP_dGyw&s" alt="Partner 2">
                 </a>
             </div>
         </div>
