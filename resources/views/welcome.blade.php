@@ -85,8 +85,8 @@
                 <h3 class="section-title">About Us</h3>
 
                 <p>
-                    The Sexual Purity Conference 2025 is a life-transforming event organized by MIV Rhema House, dedicated to equipping individuals—young and old—with biblical truths and practical wisdom to walk in purity in a world that often celebrates compromise. This gathering is more than a conference; it's a movement of hearts returning to God’s design for love, honor, and holiness.
-                </p>
+                    The Sexual Purity Conference 2025 is a life-transforming event organized by <strong>MIV Rhema House</strong>  in conjunction with <strong>Love Straight Talks Ministries</strong> , dedicated to equipping individuals—young and old—with biblical truths and practical wisdom to walk in purity in a world that often celebrates compromise.
+                    This gathering is more than a conference; it's a movement of hearts returning to God’s design for love, honor, and holiness.                </p>
 
                 <figure>
                     <img alt="About Sexual Purity Conference" class="img-responsive" src="{{ asset('frontend/assets/images/about-us.jpg') }}">
@@ -291,14 +291,20 @@
             </div>
         </div>
         <div class="row justify-content-between align-items-center">
-            <div class="col-6 col-md-6 text-center mb-4 mt-3">
+            <div class="col-12 col-md-4 text-center mb-4 mt-3">
                 <a href="#" class="partner-logo d-block">
                     <img src="{{ asset('frontend/image/lst.png') }}" alt="Partner 1">
                 </a>
             </div>
-            <div class="col-6 col-md-6 text-center mb-4 mt-3">
+            <div class="col-12 col-md-4 text-center mb-4 mt-3">
                 <a href="#" class="partner-logo d-block">
                     <img src="{{ asset('frontend/image/rhema.jpg') }}" alt="Partner 2">
+                </a>
+            </div>
+
+            <div class="col-12 col-md-4 text-center mb-4 mt-3">
+                <a href="#" class="partner-logo d-block">
+                    <img src="https://www.google.com/url?sa=i&url=https%3A%2F%2Fmenofissacharvision.com%2F&psig=AOvVaw0qzdtSmRTP4NYgpFTGTPlj&ust=1745393880966000&source=images&cd=vfe&opi=89978449&ved=0CBQQjRxqFwoTCLi5xoOR64wDFQAAAAAdAAAAABAE" alt="Partner 2">
                 </a>
             </div>
         </div>
