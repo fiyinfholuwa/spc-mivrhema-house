@@ -24,7 +24,7 @@
                 <a class="logo" href="{{route('home')}}">
 
                     <!-- logo image  -->
-{{--                    <img src="{{asset('frontend/assets/images/logo.png')}}" alt="Logo">--}}
+                    {{--                    <img src="{{asset('frontend/assets/images/logo.png')}}" alt="Logo">--}}
 
                     SPC2025
                 </a>
@@ -44,7 +44,7 @@
 
                 <!-- navigation menu -->
                 <li class="active"><a data-scroll href="#about">About</a></li>
-{{--                <li><a data-scroll href="#speakers">Speakers</a></li>--}}
+                {{--                <li><a data-scroll href="#speakers">Speakers</a></li>--}}
                 <li><a data-scroll href="#registration">Book A Seat</a></li>
                 <li><a data-scroll href="#partner">Partner</a></li>
                 <!-- <li><a data-scroll href="#">Sponsorship</a></li> -->
@@ -392,19 +392,19 @@
                         </div>
                     </div>
 
-{{--                    <div class="panel panel-default">--}}
-{{--                        <div class="panel-heading" role="tab" id="headingThree">--}}
-{{--                            <h4 class="panel-title">--}}
-{{--                                <a class="faq-toggle collapsed" role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseThree" aria-expanded="false" aria-controls="collapseThree"> What is the office address?</a>--}}
-{{--                            </h4>--}}
-{{--                        </div>--}}
+                    {{--                    <div class="panel panel-default">--}}
+                    {{--                        <div class="panel-heading" role="tab" id="headingThree">--}}
+                    {{--                            <h4 class="panel-title">--}}
+                    {{--                                <a class="faq-toggle collapsed" role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseThree" aria-expanded="false" aria-controls="collapseThree"> What is the office address?</a>--}}
+                    {{--                            </h4>--}}
+                    {{--                        </div>--}}
 
-{{--                        <div id="collapseThree" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingThree">--}}
-{{--                            <div class="panel-body">--}}
-{{--                                <p>The Sexual Purity Conference is being held at the following address: <strong>123 Conference Center Avenue, Cityville, State, ZIP.</strong> We look forward to welcoming you to this inspiring location!</p>--}}
-{{--                            </div>--}}
-{{--                        </div>--}}
-{{--                    </div>--}}
+                    {{--                        <div id="collapseThree" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingThree">--}}
+                    {{--                            <div class="panel-body">--}}
+                    {{--                                <p>The Sexual Purity Conference is being held at the following address: <strong>123 Conference Center Avenue, Cityville, State, ZIP.</strong> We look forward to welcoming you to this inspiring location!</p>--}}
+                    {{--                            </div>--}}
+                    {{--                        </div>--}}
+                    {{--                    </div>--}}
 
                     <div class="panel panel-default">
                         <div class="panel-heading" role="tab" id="headingFour">

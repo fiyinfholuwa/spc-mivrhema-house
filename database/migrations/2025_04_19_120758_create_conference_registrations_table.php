@@ -21,6 +21,7 @@ return new class extends Migration
             $table->string('how_heard');
             $table->string('previous_participation');
             $table->string('registration_type');
+            $table->string('source_type')->default('miv');
             $table->string('group_name')->nullable();
             $table->integer('group_size')->nullable();
             $table->text('expectations');

@@ -157,6 +157,23 @@
             justify-content: center;
             font-size: 1.25rem;
         }
+
+        .source-badge {
+            font-size: 0.8rem;
+            padding: 0.25rem 0.75rem;
+            border-radius: 12px;
+            font-weight: 600;
+        }
+
+        .source-miv {
+            background-color: rgba(59, 130, 246, 0.15);
+            color: #3B82F6;
+        }
+
+        .source-lst {
+            background-color: rgba(236, 72, 153, 0.15);
+            color: #EC4899;
+        }
     </style>
 </head>
 <body>
@@ -184,7 +201,7 @@
     </div>
     <!-- Stats Overview -->
     <div class="row stats-cards mb-4">
-        <div class="col-lg-3 col-md-6 mb-3">
+        <div class="col-lg-2 col-md-4 col-sm-6 mb-3">
             <div class="card p-3">
                 <div class="d-flex justify-content-between align-items-center">
                     <div>
@@ -197,11 +214,11 @@
                 </div>
             </div>
         </div>
-        <div class="col-lg-3 col-md-6 mb-3">
+        <div class="col-lg-2 col-md-4 col-sm-6 mb-3">
             <div class="card p-3">
                 <div class="d-flex justify-content-between align-items-center">
                     <div>
-                        <div class="stat-title">Individual Registrations</div>
+                        <div class="stat-title">Individual</div>
                         <p class="stat-value" id="individualReg">0</p>
                     </div>
                     <div class="stat-icon" style="background-color: rgba(16, 185, 129, 0.1); color: var(--accent-color);">
@@ -210,11 +227,11 @@
                 </div>
             </div>
         </div>
-        <div class="col-lg-3 col-md-6 mb-3">
+        <div class="col-lg-2 col-md-4 col-sm-6 mb-3">
             <div class="card p-3">
                 <div class="d-flex justify-content-between align-items-center">
                     <div>
-                        <div class="stat-title">Group Registrations</div>
+                        <div class="stat-title">Group</div>
                         <p class="stat-value" id="groupReg">0</p>
                     </div>
                     <div class="stat-icon" style="background-color: rgba(245, 158, 11, 0.1); color: #F59E0B;">
@@ -223,14 +240,40 @@
                 </div>
             </div>
         </div>
-        <div class="col-lg-3 col-md-6 mb-3">
+        <div class="col-lg-2 col-md-4 col-sm-6 mb-3">
             <div class="card p-3">
                 <div class="d-flex justify-content-between align-items-center">
                     <div>
-                        <div class="stat-title">Receiving Updates</div>
-                        <p class="stat-value" id="receivingUpdates">0</p>
+                        <div class="stat-title">MIV Source</div>
+                        <p class="stat-value" id="mivCount">0</p>
+                    </div>
+                    <div class="stat-icon" style="background-color: rgba(59, 130, 246, 0.1); color: #3B82F6;">
+                        <i class="bi bi-tag-fill"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-2 col-md-4 col-sm-6 mb-3">
+            <div class="card p-3">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <div class="stat-title">LST Source</div>
+                        <p class="stat-value" id="lstCount">0</p>
                     </div>
                     <div class="stat-icon" style="background-color: rgba(236, 72, 153, 0.1); color: #EC4899;">
+                        <i class="bi bi-tag"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-2 col-md-4 col-sm-6 mb-3">
+            <div class="card p-3">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <div class="stat-title">Updates</div>
+                        <p class="stat-value" id="receivingUpdates">0</p>
+                    </div>
+                    <div class="stat-icon" style="background-color: rgba(99, 102, 241, 0.1); color: #6366F1;">
                         <i class="bi bi-bell-fill"></i>
                     </div>
                 </div>
@@ -251,8 +294,12 @@
                     </button>
                     <ul class="dropdown-menu" aria-labelledby="filterDropdown">
                         <li><a class="dropdown-item" href="#" data-filter="all">All Submissions</a></li>
+                        <li><hr class="dropdown-divider"></li>
                         <li><a class="dropdown-item" href="#" data-filter="individual">Individual Only</a></li>
                         <li><a class="dropdown-item" href="#" data-filter="group">Groups Only</a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="dropdown-item" href="#" data-filter="source-miv">MIV Source</a></li>
+                        <li><a class="dropdown-item" href="#" data-filter="source-lst">LST Source</a></li>
                         <li><hr class="dropdown-divider"></li>
                         <li><a class="dropdown-item" href="#" data-filter="updates-yes">Receiving Updates</a></li>
                         <li><a class="dropdown-item" href="#" data-filter="updates-no">Not Receiving Updates</a></li>
@@ -275,6 +322,7 @@
                         <th>How Heard</th>
                         <th>Previous Participation</th>
                         <th>Registration Type</th>
+                        <th>Source Type</th>
                         <th>Group Name</th>
                         <th>Group Size</th>
                         <th>Expectations</th>
@@ -296,6 +344,7 @@
                             <td>{{ $item->how_heard }}</td>
                             <td>{{ $item->previous_participation }}</td>
                             <td>{{ $item->registration_type }}</td>
+                            <td><span class="source-badge source-{{ strtolower($item->source_type) }}">{{ $item->source_type }}</span></td>
                             <td>{{ $item->group_name }}</td>
                             <td>{{ $item->group_size }}</td>
                             <td>{{ $item->expectations }}</td>
@@ -351,10 +400,22 @@
         document.getElementById("groupReg").textContent = groupCount;
 
         const updatesCount = allRows.filter(row =>
-            row.children[13].textContent.trim().toLowerCase() === 'yes' ||
-            row.children[13].textContent.trim().toLowerCase() === '1'
+            row.children[14].textContent.trim().toLowerCase() === 'yes' ||
+            row.children[14].textContent.trim().toLowerCase() === '1'
         ).length;
         document.getElementById("receivingUpdates").textContent = updatesCount;
+
+        // Count MIV sources
+        const mivCount = allRows.filter(row =>
+            row.children[9].textContent.trim().toLowerCase() === 'miv'
+        ).length;
+        document.getElementById("mivCount").textContent = mivCount;
+
+        // Count LST sources
+        const lstCount = allRows.filter(row =>
+            row.children[9].textContent.trim().toLowerCase() === 'lst'
+        ).length;
+        document.getElementById("lstCount").textContent = lstCount;
     }
 
     function displayRows(rows) {
@@ -438,16 +499,26 @@
                     row.children[8].textContent.trim().toLowerCase() === 'group'
                 );
                 break;
+            case 'source-miv':
+                filtered = allRows.filter(row =>
+                    row.children[9].textContent.trim().toLowerCase() === 'miv'
+                );
+                break;
+            case 'source-lst':
+                filtered = allRows.filter(row =>
+                    row.children[9].textContent.trim().toLowerCase() === 'lst'
+                );
+                break;
             case 'updates-yes':
                 filtered = allRows.filter(row =>
-                    row.children[13].textContent.trim().toLowerCase() === 'yes' ||
-                    row.children[13].textContent.trim().toLowerCase() === '1'
+                    row.children[14].textContent.trim().toLowerCase() === 'yes' ||
+                    row.children[14].textContent.trim().toLowerCase() === '1'
                 );
                 break;
             case 'updates-no':
                 filtered = allRows.filter(row =>
-                    row.children[13].textContent.trim().toLowerCase() === 'no' ||
-                    row.children[13].textContent.trim().toLowerCase() === '0'
+                    row.children[14].textContent.trim().toLowerCase() === 'no' ||
+                    row.children[14].textContent.trim().toLowerCase() === '0'
                 );
                 break;
             default:
@@ -482,16 +553,26 @@
                         row.children[8].textContent.trim().toLowerCase() === 'group'
                     );
                     break;
+                case 'source-miv':
+                    filtered = filtered.filter(row =>
+                        row.children[9].textContent.trim().toLowerCase() === 'miv'
+                    );
+                    break;
+                case 'source-lst':
+                    filtered = filtered.filter(row =>
+                        row.children[9].textContent.trim().toLowerCase() === 'lst'
+                    );
+                    break;
                 case 'updates-yes':
                     filtered = filtered.filter(row =>
-                        row.children[13].textContent.trim().toLowerCase() === 'yes' ||
-                        row.children[13].textContent.trim().toLowerCase() === '1'
+                        row.children[14].textContent.trim().toLowerCase() === 'yes' ||
+                        row.children[14].textContent.trim().toLowerCase() === '1'
                     );
                     break;
                 case 'updates-no':
                     filtered = filtered.filter(row =>
-                        row.children[13].textContent.trim().toLowerCase() === 'no' ||
-                        row.children[13].textContent.trim().toLowerCase() === '0'
+                        row.children[14].textContent.trim().toLowerCase() === 'no' ||
+                        row.children[14].textContent.trim().toLowerCase() === '0'
                     );
                     break;
             }
@@ -535,6 +616,8 @@
             switch(currentFilter) {
                 case 'individual': filterText = 'Individual Only'; break;
                 case 'group': filterText = 'Groups Only'; break;
+                case 'source-miv': filterText = 'MIV Source'; break;
+                case 'source-lst': filterText = 'LST Source'; break;
                 case 'updates-yes': filterText = 'Receiving Updates'; break;
                 case 'updates-no': filterText = 'Not Receiving Updates'; break;
             }

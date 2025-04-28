@@ -3,7 +3,11 @@
 namespace App\Http\Controllers;
 
 use App\Models\ConferenceRegistration;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+
+
+use Illuminate\Support\Facades\Validator;
 
 class FrontendController extends Controller
 {
@@ -38,6 +42,43 @@ class FrontendController extends Controller
     {
         $registrations = ConferenceRegistration::orderByDesc('id')->get();
         return view('get_data', compact('registrations'));
+    }
+
+
+
+    public function store_api(Request $request):JsonResponse
+    {
+        $validator = Validator::make($request->all(), [
+            'fullname' => 'required|string|max:255',
+            'gender' => 'required|string|max:10',
+            'phone' => 'required|string|max:20',
+            'email' => 'required|email|max:255',
+            'location' => 'nullable|string|max:255',
+            'how_heard' => 'required|string|max:255',
+            'previous_participation' => 'required|string|max:255',
+            'registration_type' => 'required|string|max:255',
+            'group_name' => 'nullable|string|max:255',
+            'group_size' => 'nullable|integer|min:1',
+            'expectations' => 'required|string|max:1000',
+            'commitment' => 'required|string|max:1000',
+            'source_type' => 'required',
+            'receive_updates' => 'required|in:yes,no', // assuming yes/no
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Validation failed',
+                'errors' => $validator->errors()
+            ], 422);
+        }
+
+        ConferenceRegistration::create($validator->validated());
+
+        return response()->json([
+            'status' => true,
+            'message' => 'Registration successful.',
+        ], 201);
     }
 
 }
