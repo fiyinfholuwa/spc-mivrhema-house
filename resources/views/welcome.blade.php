@@ -123,7 +123,7 @@
             </div>
             <div class="col-sm-3">
                 <i class="ion-ios-location"></i>
-                <h3>MIV Rhema House<br>Nigeria</h3>
+                <h3>Bethel retreat center 0pp, NNPC filling station mosafejo bus-stop, along sango eleyele,Rd.  Ibadan</h3>
             </div>
             <div class="col-sm-3">
                 <i class="ion-pricetags"></i>
