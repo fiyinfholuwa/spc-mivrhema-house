@@ -323,6 +323,8 @@
                         <th>Previous Participation</th>
                         <th>Registration Type</th>
                         <th>Source Type</th>
+                        <th>Marital Status</th>
+                        <th>Coming  with Spouse</th>
                         <th>Group Name</th>
                         <th>Group Size</th>
                         <th>Expectations</th>
@@ -345,6 +347,8 @@
                             <td>{{ $item->previous_participation }}</td>
                             <td>{{ $item->registration_type }}</td>
                             <td><span class="source-badge source-{{ strtolower($item->source_type) }}">{{ $item->source_type }}</span></td>
+                            <td>{{ $item->marital_status }}</td>
+                            <td>{{ $item->coming_with_spouse }}</td>
                             <td>{{ $item->group_name }}</td>
                             <td>{{ $item->group_size }}</td>
                             <td>{{ $item->expectations }}</td>

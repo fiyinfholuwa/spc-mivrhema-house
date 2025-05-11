@@ -237,13 +237,54 @@
                         <textarea class="form-control" name="expectations" id="expectations" rows="3" required></textarea>
                     </div>
 
-                    <div class="form-group">
-                        <label>Do you commit to attend all sessions of the conference?</label>
-                        <select class="form-control" name="commitment" id="commitment" required>
-                            <option value="">Select an option</option>
-                            <option value="yes">Yes</option>
-                            <option value="no">No</option>
-                        </select>
+                    <div class="row">
+                        <div class="col-lg-4">
+                            <div class="form-group">
+                                <label>Do you commit to attend all sessions?</label>
+                                <select class="form-control" name="commitment" id="commitment" required>
+                                    <option value="">Select an option</option>
+                                    <option value="yes">Yes</option>
+                                    <option value="no">No</option>
+                                </select>
+                            </div>
+                        </div>
+                            <div class="col-lg-4">
+                            <div class="form-group">
+                                <label>Marital Status</label>
+                                <select class="form-control" name="marital_status" id="marital_status" required onchange="showSpouseField()">
+                                    <option value="">Select an option</option>
+                                    <option value="single">Single</option>
+                                    <option value="married">Married</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- This will appear only if 'Married' is selected -->
+                        <div class="col-lg-4" id="spouse_field" style="display: none;">
+                            <div class="form-group">
+                                <label>Are you coming with your spouse?</label>
+                                <select class="form-control" name="coming_with_spouse" id="coming_with_spouse">
+                                    <option value="">Select an option</option>
+                                    <option value="yes">Yes</option>
+                                    <option value="no">No</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <script>
+                            function showSpouseField() {
+                                var maritalStatus = document.getElementById('marital_status').value;
+                                var spouseField = document.getElementById('spouse_field');
+
+                                if (maritalStatus === 'married') {
+                                    spouseField.style.display = 'block';
+                                } else {
+                                    spouseField.style.display = 'none';
+                                }
+                            }
+                        </script>
+
+                    </div>
                     </div>
 
                     <div class="form-group">
