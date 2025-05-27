@@ -69,7 +69,58 @@
 
         <h1>Sexual Purity Conference 2025</h1>
 
-        <p>A Compelling Conviction</p>
+        <p id="themeText" class="theme-text">Theme: A Compelling Conviction</p>
+<style>
+    .theme-text {
+        font-size: 1.5rem;
+        font-weight: bold;
+        color: #fff;
+        background: linear-gradient(135deg, rgba(255, 107, 107, 0.3), rgba(68, 68, 68, 0.3));
+        padding: 1rem 1.5rem;
+        border-radius: 10px;
+        text-align: center;
+        width: 60%;
+        margin: 2rem auto;
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        animation: fadeInUp 0.8s ease-out forwards;
+        opacity: 0;
+        transform: translateY(30px);
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .theme-text:hover {
+        transform: scale(1.04);
+        box-shadow: 0 12px 28px rgba(0, 0, 0, 0.35);
+    }
+
+    @keyframes fadeInUp {
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    @media (max-width: 600px) {
+        .theme-text {
+            font-size: 1.1rem;
+            width: 90%;
+            padding: 0.8rem 1rem;
+        }
+    }
+
+</style>
+
+        <script>
+            window.addEventListener('load', () => {
+                const text = document.getElementById('themeText');
+                text.classList.remove('fadeInUp');
+                void text.offsetWidth; // force reflow
+                text.classList.add('theme-text'); // re-trigger
+            });
+        </script>
 
         <a class="btn btn-white" data-scroll href="#registration">Register Now</a>
 
