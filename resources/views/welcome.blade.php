@@ -69,7 +69,7 @@
 
         <h1>Sexual Purity Conference 2025</h1>
 
-        <p>Walking in Truth, Living with Purpose</p>
+        <p>A Compelling Conviction</p>
 
         <a class="btn btn-white" data-scroll href="#registration">Register Now</a>
 
