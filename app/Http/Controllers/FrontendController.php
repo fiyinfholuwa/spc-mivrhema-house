@@ -90,24 +90,33 @@ class FrontendController extends Controller
     {
         $registration = \App\Models\ConferenceRegistration::findOrFail($id);
 
-        // Only assign a group if not already confirmed
         if ($registration->confirmed_reg !== 'confirmed') {
-            // Get the last confirmed registration with a bible group
-            $lastGroup = \App\Models\ConferenceRegistration::where('confirmed_reg', 'confirmed')
-                ->whereNotNull('bible_group')
-                ->orderByDesc('id')
-                ->value('bible_group');
 
-            // Determine next group (1 to 7, then wrap around)
-            $nextGroup = ($lastGroup ?? 0) % 7 + 1;
+            // Count how many members are in each group (1–7)
+            $groupCounts = \App\Models\ConferenceRegistration::where('confirmed_reg', 'confirmed')
+                ->selectRaw('bible_group, COUNT(*) as total')
+                ->groupBy('bible_group')
+                ->pluck('total', 'bible_group');
 
-            // Update and save
+            // Build array of counts for groups 1 to 7
+            $groupUsage = [];
+            for ($i = 1; $i <= 7; $i++) {
+                $groupUsage[$i] = $groupCounts[$i] ?? 0;
+            }
+
+            // Find the group with the least number of members
+            $nextGroup = array_keys($groupUsage, min($groupUsage))[0];
+
+            // Assign
             $registration->confirmed_reg = 'confirmed';
             $registration->bible_group = $nextGroup;
             $registration->save();
         }
 
-        return response()->json(['success' => true]);
+        return response()->json([
+            'success' => true,
+            'assigned_group' => $registration->bible_group
+        ]);
     }
 
 }
