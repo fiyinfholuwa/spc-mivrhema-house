@@ -354,12 +354,20 @@
                                             data-bs-target="#detailsModal">
                                         <i class="bi bi-eye"></i>
                                     </button>
-                                    <button class="btn btn-sm btn-outline-success confirm-arrival-btn"
-                                            onclick="confirmArrival({{ $item->id }}, '{{ $item->fullname }}')"
-                                            data-bs-toggle="modal"
-                                            data-bs-target="#confirmModal">
-                                        <i class="bi bi-check-circle"></i>
-                                    </button>
+                                    @if(!is_null($item->confirmed_reg))
+                                        <span>
+    <i class="bi bi-check-circle-fill" style="color: green;"></i>
+</span>
+
+                                    @else
+                                        <button class="btn btn-sm btn-outline-success confirm-arrival-btn"
+                                                onclick="confirmArrival({{ $item->id }}, '{{ $item->fullname }}')"
+                                                data-bs-toggle="modal"
+                                                data-bs-target="#confirmModal">
+                                            <i class="bi bi-check-circle"></i>
+                                        </button>
+                                    @endif
+
                                 </div>
                             </td>
                         </tr>
