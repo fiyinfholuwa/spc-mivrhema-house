@@ -85,4 +85,29 @@ class FrontendController extends Controller
         ], 201);
     }
 
+
+    public function confirmArrival($id)
+    {
+        $registration = \App\Models\ConferenceRegistration::findOrFail($id);
+
+        // Only assign a group if not already confirmed
+        if ($registration->confirmed_reg !== 'confirmed') {
+            // Get the last confirmed registration with a bible group
+            $lastGroup = \App\Models\ConferenceRegistration::where('confirmed_reg', 'confirmed')
+                ->whereNotNull('bible_group')
+                ->orderByDesc('id')
+                ->value('bible_group');
+
+            // Determine next group (1 to 7, then wrap around)
+            $nextGroup = ($lastGroup ?? 0) % 7 + 1;
+
+            // Update and save
+            $registration->confirmed_reg = 'confirmed';
+            $registration->bible_group = $nextGroup;
+            $registration->save();
+        }
+
+        return response()->json(['success' => true]);
+    }
+
 }

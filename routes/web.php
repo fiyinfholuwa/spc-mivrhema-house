@@ -10,6 +10,8 @@ Route::get('/', [FrontendController::class, 'home'])->name('home');
 
 
 Route::post('/register-conference', [FrontendController::class, 'store'])->name('register.conference');
+
+Route::post('/confirm-arrival/{id}', [FrontendController::class, 'confirmArrival'])->name('confirm.arrival');
 //Route::get('/submissions', [FrontendController::class, 'showRegistrationsPage']);
 
 //Route::get('/dashboard', function () {

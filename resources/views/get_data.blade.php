@@ -4,11 +4,14 @@
     <meta charset="UTF-8">
     <title>Conference Submissions Dashboard</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
 
     <!-- Bootstrap 5 -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- Bootstrap Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.11.1/font/bootstrap-icons.min.css">
+    <!-- SweetAlert2 -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
 
     <style>
         :root {
@@ -93,27 +96,10 @@
             background-color: #0DA271;
         }
 
-        .pagination-container {
-            margin-top: 1.5rem;
-        }
-
-        .page-btn {
-            width: 35px;
-            height: 35px;
-            border-radius: 50%;
-            margin: 0 4px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: 500;
-            font-size: 0.9rem;
-            transition: all 0.2s;
-        }
-
-        .page-btn.active {
-            background-color: var(--primary-color);
-            color: white;
-            border-color: var(--primary-color);
+        .btn-sm {
+            padding: 0.25rem 0.5rem;
+            font-size: 0.8rem;
+            border-radius: 6px;
         }
 
         .card-header {
@@ -158,21 +144,57 @@
             font-size: 1.25rem;
         }
 
-        .source-badge {
+        .status-badge {
             font-size: 0.8rem;
             padding: 0.25rem 0.75rem;
             border-radius: 12px;
             font-weight: 600;
         }
 
-        .source-miv {
-            background-color: rgba(59, 130, 246, 0.15);
-            color: #3B82F6;
+        .status-confirmed {
+            background-color: rgba(16, 185, 129, 0.15);
+            color: #10B981;
         }
 
-        .source-lst {
-            background-color: rgba(236, 72, 153, 0.15);
-            color: #EC4899;
+        .status-pending {
+            background-color: rgba(245, 158, 11, 0.15);
+            color: #F59E0B;
+        }
+
+        .status-cancelled {
+            background-color: rgba(239, 68, 68, 0.15);
+            color: #EF4444;
+        }
+
+        .modal-header {
+            border-bottom: 1px solid #E5E7EB;
+        }
+
+        .modal-footer {
+            border-top: 1px solid #E5E7EB;
+        }
+
+        .info-row {
+            padding: 0.5rem 0;
+            border-bottom: 1px solid #F3F4F6;
+        }
+
+        .info-row:last-child {
+            border-bottom: none;
+        }
+
+        .info-label {
+            font-weight: 600;
+            color: var(--secondary-color);
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 0.25rem;
+        }
+
+        .table td {
+            vertical-align: middle;
         }
     </style>
 </head>
@@ -190,7 +212,7 @@
             <button id="exportBtn" class="btn btn-export btn-success">
                 <i class="bi bi-download me-2"></i>Export CSV
             </button>
-            <a href="{{ route('logout') }}"  style="background-color: red;" class="btn btn-export btn-danger"
+            <a href="{{ route('logout') }}" style="background-color: red;" class="btn btn-export btn-danger"
                onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
                 <i class="bi bi-box-arrow-right me-2"></i>Logout
             </a>
@@ -199,6 +221,7 @@
             </form>
         </div>
     </div>
+
     <!-- Stats Overview -->
     <div class="row stats-cards mb-4">
         <div class="col-lg-2 col-md-4 col-sm-6 mb-3">
@@ -206,7 +229,7 @@
                 <div class="d-flex justify-content-between align-items-center">
                     <div>
                         <div class="stat-title">Total Submissions</div>
-                        <p class="stat-value" id="totalSubmissions">0</p>
+                        <p class="stat-value">{{ $registrations->count() }}</p>
                     </div>
                     <div class="stat-icon" style="background-color: rgba(59, 130, 246, 0.1); color: var(--primary-color);">
                         <i class="bi bi-people-fill"></i>
@@ -218,10 +241,53 @@
             <div class="card p-3">
                 <div class="d-flex justify-content-between align-items-center">
                     <div>
-                        <div class="stat-title">Individual</div>
-                        <p class="stat-value" id="individualReg">0</p>
+                        <div class="stat-title">Confirmed</div>
+                        <p class="stat-value">{{ $registrations->where('confirmed_reg', 'confirmed')->count() }}</p>
                     </div>
                     <div class="stat-icon" style="background-color: rgba(16, 185, 129, 0.1); color: var(--accent-color);">
+                        <i class="bi bi-check-circle-fill"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-2 col-md-4 col-sm-6 mb-3">
+            <div class="card p-3">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <div class="stat-title">Pending</div>
+                        <p class="stat-value">
+                            {{ $registrations->filter(function ($reg) {
+                                return is_null($reg->confirmed_reg) || $reg->confirmed_reg === 'pending';
+                            })->count() }}
+                        </p>
+                    </div>
+                    <div class="stat-icon" style="background-color: rgba(245, 158, 11, 0.1); color: #F59E0B;">
+                        <i class="bi bi-clock-fill"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-2 col-md-4 col-sm-6 mb-3">
+            <div class="card p-3">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <div class="stat-title">Bible Groups</div>
+                        <p class="stat-value">{{ $registrations->whereNotNull('bible_group')->where('bible_group', '!=', '')->count() }}</p>
+                    </div>
+                    <div class="stat-icon" style="background-color: rgba(99, 102, 241, 0.1); color: #6366F1;">
+                        <i class="bi bi-book-fill"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-2 col-md-4 col-sm-6 mb-3">
+            <div class="card p-3">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <div class="stat-title">Individual</div>
+                        <p class="stat-value">{{ $registrations->where('registration_type', 'individual')->count() }}</p>
+                    </div>
+                    <div class="stat-icon" style="background-color: rgba(236, 72, 153, 0.1); color: #EC4899;">
                         <i class="bi bi-person-fill"></i>
                     </div>
                 </div>
@@ -231,50 +297,11 @@
             <div class="card p-3">
                 <div class="d-flex justify-content-between align-items-center">
                     <div>
-                        <div class="stat-title">Group</div>
-                        <p class="stat-value" id="groupReg">0</p>
+                        <div class="stat-title">Groups</div>
+                        <p class="stat-value">{{ $registrations->where('registration_type', 'group')->count() }}</p>
                     </div>
-                    <div class="stat-icon" style="background-color: rgba(245, 158, 11, 0.1); color: #F59E0B;">
+                    <div class="stat-icon" style="background-color: rgba(168, 85, 247, 0.1); color: #A855F7;">
                         <i class="bi bi-people"></i>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="col-lg-2 col-md-4 col-sm-6 mb-3">
-            <div class="card p-3">
-                <div class="d-flex justify-content-between align-items-center">
-                    <div>
-                        <div class="stat-title">MIV Source</div>
-                        <p class="stat-value" id="mivCount">0</p>
-                    </div>
-                    <div class="stat-icon" style="background-color: rgba(59, 130, 246, 0.1); color: #3B82F6;">
-                        <i class="bi bi-tag-fill"></i>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="col-lg-2 col-md-4 col-sm-6 mb-3">
-            <div class="card p-3">
-                <div class="d-flex justify-content-between align-items-center">
-                    <div>
-                        <div class="stat-title">LST Source</div>
-                        <p class="stat-value" id="lstCount">0</p>
-                    </div>
-                    <div class="stat-icon" style="background-color: rgba(236, 72, 153, 0.1); color: #EC4899;">
-                        <i class="bi bi-tag"></i>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="col-lg-2 col-md-4 col-sm-6 mb-3">
-            <div class="card p-3">
-                <div class="d-flex justify-content-between align-items-center">
-                    <div>
-                        <div class="stat-title">Updates</div>
-                        <p class="stat-value" id="receivingUpdates">0</p>
-                    </div>
-                    <div class="stat-icon" style="background-color: rgba(99, 102, 241, 0.1); color: #6366F1;">
-                        <i class="bi bi-bell-fill"></i>
                     </div>
                 </div>
             </div>
@@ -285,26 +312,10 @@
         <div class="card-header d-flex justify-content-between align-items-center flex-wrap">
             <div class="search-wrapper mb-2 mb-md-0" style="min-width: 300px;">
                 <i class="bi bi-search"></i>
-                <input type="text" id="searchInput" class="form-control search-input" placeholder="Search submissions...">
+                <input type="text" id="searchInput" class="form-control search-input" placeholder="Search by name, email, phone, location...">
             </div>
-            <div class="d-flex gap-2">
-                <div class="dropdown">
-                    <button class="btn btn-outline-secondary dropdown-toggle" type="button" id="filterDropdown" data-bs-toggle="dropdown" aria-expanded="false">
-                        <i class="bi bi-funnel me-1"></i>Filters
-                    </button>
-                    <ul class="dropdown-menu" aria-labelledby="filterDropdown">
-                        <li><a class="dropdown-item" href="#" data-filter="all">All Submissions</a></li>
-                        <li><hr class="dropdown-divider"></li>
-                        <li><a class="dropdown-item" href="#" data-filter="individual">Individual Only</a></li>
-                        <li><a class="dropdown-item" href="#" data-filter="group">Groups Only</a></li>
-                        <li><hr class="dropdown-divider"></li>
-                        <li><a class="dropdown-item" href="#" data-filter="source-miv">MIV Source</a></li>
-                        <li><a class="dropdown-item" href="#" data-filter="source-lst">LST Source</a></li>
-                        <li><hr class="dropdown-divider"></li>
-                        <li><a class="dropdown-item" href="#" data-filter="updates-yes">Receiving Updates</a></li>
-                        <li><a class="dropdown-item" href="#" data-filter="updates-no">Not Receiving Updates</a></li>
-                    </ul>
-                </div>
+            <div class="text-secondary small">
+                Showing <span id="showingCount">{{ $registrations->count() }}</span> of <span id="totalCount">{{ $registrations->count() }}</span> entries
             </div>
         </div>
 
@@ -313,328 +324,366 @@
                 <table class="table" id="registrationsTable">
                     <thead>
                     <tr>
-                        <th>ID</th>
-                        <th>Full Name</th>
-                        <th>Gender</th>
-                        <th>Phone</th>
+                        <th>Name</th>
                         <th>Email</th>
+                        <th>Phone</th>
                         <th>Location</th>
-                        <th>How Heard</th>
-                        <th>Previous Participation</th>
-                        <th>Registration Type</th>
-                        <th>Source Type</th>
-                        <th>Marital Status</th>
-                        <th>Coming  with Spouse</th>
-                        <th>Group Name</th>
-                        <th>Group Size</th>
-                        <th>Expectations</th>
-                        <th>Commitment</th>
-                        <th>Receive Updates</th>
-                        <th>Created At</th>
-                        <th>Updated At</th>
+                        <th>Status</th>
+                        <th>Bible Group</th>
+                        <th>Actions</th>
                     </tr>
                     </thead>
                     <tbody id="tableBody">
-                    @foreach ($registrations as $item)
-                        <tr>
-                            <td>{{ $item->id }}</td>
+                    @forelse ($registrations as $item)
+                        <tr data-registration="{{ json_encode($item) }}" data-id="{{ $item->id }}">
                             <td>{{ $item->fullname }}</td>
-                            <td>{{ $item->gender }}</td>
-                            <td>{{ $item->phone }}</td>
                             <td>{{ $item->email }}</td>
+                            <td>{{ $item->phone }}</td>
                             <td>{{ $item->location }}</td>
-                            <td>{{ $item->how_heard }}</td>
-                            <td>{{ $item->previous_participation }}</td>
-                            <td>{{ $item->registration_type }}</td>
-                            <td><span class="source-badge source-{{ strtolower($item->source_type) }}">{{ $item->source_type }}</span></td>
-                            <td>{{ $item->marital_status }}</td>
-                            <td>{{ $item->coming_with_spouse }}</td>
-                            <td>{{ $item->group_name }}</td>
-                            <td>{{ $item->group_size }}</td>
-                            <td>{{ $item->expectations }}</td>
-                            <td>{{ $item->commitment }}</td>
-                            <td>{{ $item->receive_updates }}</td>
-                            <td>{{ $item->created_at }}</td>
-                            <td>{{ $item->updated_at }}</td>
+                            <td>
+                                <span class="status-badge status-{{ strtolower($item->confirmed_reg ?? 'pending') }}" id="status-{{ $item->id }}">
+                                    {{ ucfirst($item->confirmed_reg ?? 'Pending') }}
+                                </span>
+                            </td>
+                            <td>{{ $item->bible_group ?? 'Not Assigned' }}</td>
+                            <td>
+                                <div class="action-buttons">
+                                    <button class="btn btn-sm btn-outline-primary view-details-btn"
+                                            onclick="viewDetails({{ $item->id }})"
+                                            data-bs-toggle="modal"
+                                            data-bs-target="#detailsModal">
+                                        <i class="bi bi-eye"></i>
+                                    </button>
+                                    <button class="btn btn-sm btn-outline-success confirm-arrival-btn"
+                                            onclick="confirmArrival({{ $item->id }}, '{{ $item->fullname }}')"
+                                            data-bs-toggle="modal"
+                                            data-bs-target="#confirmModal">
+                                        <i class="bi bi-check-circle"></i>
+                                    </button>
+                                </div>
+                            </td>
                         </tr>
-                    @endforeach
+                    @empty
+                        <tr>
+                            <td colspan="7" class="text-center py-4">No registrations found</td>
+                        </tr>
+                    @endforelse
                     </tbody>
                 </table>
-            </div>
-        </div>
-
-        <div class="card-footer bg-white border-top-0">
-            <div class="d-flex justify-content-between align-items-center flex-wrap">
-                <div class="text-secondary small mb-2 mb-md-0">
-                    Showing <span id="showingCount">0</span> of <span id="totalCount">0</span> entries
-                </div>
-                <div class="pagination-container d-flex justify-content-center" id="pagination"></div>
             </div>
         </div>
     </div>
 </div>
 
-<!-- Bootstrap JS and Dependencies -->
+<!-- Details Modal -->
+<div class="modal fade" id="detailsModal" tabindex="-1" aria-labelledby="detailsModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="detailsModalLabel">Registration Details</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" id="modalBody">
+                <!-- Content will be populated by JavaScript -->
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Confirm Arrival Modal -->
+<div class="modal fade" id="confirmModal" tabindex="-1" aria-labelledby="confirmModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="confirmModalLabel">Confirm Arrival</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>Are you sure you want to confirm the arrival of <strong id="confirm-name"></strong>?</p>
+                <p class="text-muted small">This will update their registration status to "Confirmed".</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-success" id="proceedConfirm">Confirm Arrival</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Scripts -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
-<!-- JavaScript Section -->
 <script>
-    const rowsPerPage = 10;
-    const tableBody = document.getElementById("tableBody");
-    const allRows = Array.from(tableBody.querySelectorAll("tr"));
-    const pagination = document.getElementById("pagination");
-    const searchInput = document.getElementById("searchInput");
-    const showingCountEl = document.getElementById("showingCount");
-    const totalCountEl = document.getElementById("totalCount");
-    let currentPage = 1;
-    let currentFilter = 'all';
+    // Global variables
+    let allRows = [];
+    let currentRegistrationId = null;
+    let registrationsData = @json($registrations);
 
-    // Initialize stats
-    function updateStats() {
-        document.getElementById("totalSubmissions").textContent = allRows.length;
-
-        const individualCount = allRows.filter(row =>
-            row.children[8].textContent.trim().toLowerCase() === 'individual'
-        ).length;
-        document.getElementById("individualReg").textContent = individualCount;
-
-        const groupCount = allRows.filter(row =>
-            row.children[8].textContent.trim().toLowerCase() === 'group'
-        ).length;
-        document.getElementById("groupReg").textContent = groupCount;
-
-        const updatesCount = allRows.filter(row =>
-            row.children[14].textContent.trim().toLowerCase() === 'yes' ||
-            row.children[14].textContent.trim().toLowerCase() === '1'
-        ).length;
-        document.getElementById("receivingUpdates").textContent = updatesCount;
-
-        // Count MIV sources
-        const mivCount = allRows.filter(row =>
-            row.children[9].textContent.trim().toLowerCase() === 'miv'
-        ).length;
-        document.getElementById("mivCount").textContent = mivCount;
-
-        // Count LST sources
-        const lstCount = allRows.filter(row =>
-            row.children[9].textContent.trim().toLowerCase() === 'lst'
-        ).length;
-        document.getElementById("lstCount").textContent = lstCount;
-    }
-
-    function displayRows(rows) {
-        const start = (currentPage - 1) * rowsPerPage;
-        const end = start + rowsPerPage;
-        const displayedRows = rows.slice(start, end);
-
-        allRows.forEach(row => row.style.display = "none");
-        displayedRows.forEach(row => row.style.display = "");
-
-        showingCountEl.textContent = displayedRows.length;
-        totalCountEl.textContent = rows.length;
-    }
-
-    function updatePagination(rows) {
-        const totalPages = Math.ceil(rows.length / rowsPerPage);
-        pagination.innerHTML = "";
-
-        // Previous button
-        if (totalPages > 1) {
-            const prevBtn = document.createElement("button");
-            prevBtn.innerHTML = '<i class="bi bi-chevron-left"></i>';
-            prevBtn.className = `btn btn-sm btn-outline-secondary page-btn ${currentPage === 1 ? 'disabled' : ''}`;
-            prevBtn.addEventListener("click", () => {
-                if (currentPage > 1) {
-                    currentPage--;
-                    displayRows(rows);
-                    updatePagination(rows);
-                }
-            });
-            pagination.appendChild(prevBtn);
-        }
-
-        // Page buttons
-        let startPage = Math.max(1, currentPage - 2);
-        let endPage = Math.min(totalPages, startPage + 4);
-
-        if (endPage - startPage < 4) {
-            startPage = Math.max(1, endPage - 4);
-        }
-
-        for (let i = startPage; i <= endPage; i++) {
-            const btn = document.createElement("button");
-            btn.innerText = i;
-            btn.className = `btn btn-sm btn-outline-primary page-btn ${i === currentPage ? 'active' : ''}`;
-            btn.addEventListener("click", () => {
-                currentPage = i;
-                displayRows(rows);
-                updatePagination(rows);
-            });
-            pagination.appendChild(btn);
-        }
-
-        // Next button
-        if (totalPages > 1) {
-            const nextBtn = document.createElement("button");
-            nextBtn.innerHTML = '<i class="bi bi-chevron-right"></i>';
-            nextBtn.className = `btn btn-sm btn-outline-secondary page-btn ${currentPage === totalPages ? 'disabled' : ''}`;
-            nextBtn.addEventListener("click", () => {
-                if (currentPage < totalPages) {
-                    currentPage++;
-                    displayRows(rows);
-                    updatePagination(rows);
-                }
-            });
-            pagination.appendChild(nextBtn);
-        }
-    }
-
-    function applyFilter(filterType) {
-        let filtered = [...allRows];
-
-        switch(filterType) {
-            case 'individual':
-                filtered = allRows.filter(row =>
-                    row.children[8].textContent.trim().toLowerCase() === 'individual'
-                );
-                break;
-            case 'group':
-                filtered = allRows.filter(row =>
-                    row.children[8].textContent.trim().toLowerCase() === 'group'
-                );
-                break;
-            case 'source-miv':
-                filtered = allRows.filter(row =>
-                    row.children[9].textContent.trim().toLowerCase() === 'miv'
-                );
-                break;
-            case 'source-lst':
-                filtered = allRows.filter(row =>
-                    row.children[9].textContent.trim().toLowerCase() === 'lst'
-                );
-                break;
-            case 'updates-yes':
-                filtered = allRows.filter(row =>
-                    row.children[14].textContent.trim().toLowerCase() === 'yes' ||
-                    row.children[14].textContent.trim().toLowerCase() === '1'
-                );
-                break;
-            case 'updates-no':
-                filtered = allRows.filter(row =>
-                    row.children[14].textContent.trim().toLowerCase() === 'no' ||
-                    row.children[14].textContent.trim().toLowerCase() === '0'
-                );
-                break;
-            default:
-                filtered = [...allRows];
-        }
-
-        // Also apply search filter if there's text in the search box
-        const query = searchInput.value.toLowerCase();
-        if (query) {
-            filtered = filtered.filter(row => row.innerText.toLowerCase().includes(query));
-        }
-
-        currentPage = 1;
-        displayRows(filtered);
-        updatePagination(filtered);
-    }
-
-    searchInput.addEventListener("input", function () {
-        const query = this.value.toLowerCase();
-        let filtered = [...allRows];
-
-        if (currentFilter !== 'all') {
-            // First apply the current filter
-            switch(currentFilter) {
-                case 'individual':
-                    filtered = filtered.filter(row =>
-                        row.children[8].textContent.trim().toLowerCase() === 'individual'
-                    );
-                    break;
-                case 'group':
-                    filtered = filtered.filter(row =>
-                        row.children[8].textContent.trim().toLowerCase() === 'group'
-                    );
-                    break;
-                case 'source-miv':
-                    filtered = filtered.filter(row =>
-                        row.children[9].textContent.trim().toLowerCase() === 'miv'
-                    );
-                    break;
-                case 'source-lst':
-                    filtered = filtered.filter(row =>
-                        row.children[9].textContent.trim().toLowerCase() === 'lst'
-                    );
-                    break;
-                case 'updates-yes':
-                    filtered = filtered.filter(row =>
-                        row.children[14].textContent.trim().toLowerCase() === 'yes' ||
-                        row.children[14].textContent.trim().toLowerCase() === '1'
-                    );
-                    break;
-                case 'updates-no':
-                    filtered = filtered.filter(row =>
-                        row.children[14].textContent.trim().toLowerCase() === 'no' ||
-                        row.children[14].textContent.trim().toLowerCase() === '0'
-                    );
-                    break;
-            }
-        }
-
-        // Then apply search filter
-        filtered = filtered.filter(row => row.innerText.toLowerCase().includes(query));
-
-        currentPage = 1;
-        displayRows(filtered);
-        updatePagination(filtered);
+    // Initialize on DOM load
+    document.addEventListener('DOMContentLoaded', function() {
+        allRows = Array.from(document.querySelectorAll('#tableBody tr[data-id]'));
+        setupSearch();
     });
 
-    document.getElementById("exportBtn").addEventListener("click", function () {
-        const headers = Array.from(document.querySelectorAll("#registrationsTable thead th")).map(th => `"${th.innerText}"`);
-        const rows = Array.from(document.querySelectorAll("#registrationsTable tbody tr")).map(row => {
-            return Array.from(row.querySelectorAll("td")).map(td => `"${td.innerText.replace(/"/g, '""')}"`).join(",");
-        });
+    // Search functionality
+    function setupSearch() {
+        const searchInput = document.getElementById('searchInput');
+        const showingCount = document.getElementById('showingCount');
+        const totalCount = document.getElementById('totalCount');
 
-        const csv = [headers.join(","), ...rows].join("\n");
-        const blob = new Blob([csv], { type: "text/csv" });
+        searchInput.addEventListener('input', function() {
+            const query = this.value.toLowerCase().trim();
+            let visibleCount = 0;
+
+            allRows.forEach(row => {
+                const registrationData = JSON.parse(row.dataset.registration);
+                const searchableText = [
+                    registrationData.fullname,
+                    registrationData.email,
+                    registrationData.phone,
+                    registrationData.location,
+                    registrationData.confirmed_reg,
+                    registrationData.bible_group
+                ].join(' ').toLowerCase();
+
+                if (query === '' || searchableText.includes(query)) {
+                    row.style.display = '';
+                    visibleCount++;
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+
+            showingCount.textContent = visibleCount;
+        });
+    }
+
+    // View details function
+    function viewDetails(registrationId) {
+        const registration = registrationsData.find(r => r.id == registrationId);
+        if (!registration) return;
+
+        const modalBody = document.getElementById('modalBody');
+        modalBody.innerHTML = `
+        <div class="row">
+            <div class="col-md-6">
+                <div class="info-row d-flex justify-content-between">
+                    <span class="info-label">ID:</span>
+                    <span>${registration.id}</span>
+                </div>
+                <div class="info-row d-flex justify-content-between">
+                    <span class="info-label">Full Name:</span>
+                    <span>${registration.fullname || 'N/A'}</span>
+                </div>
+                <div class="info-row d-flex justify-content-between">
+                    <span class="info-label">Gender:</span>
+                    <span>${registration.gender || 'N/A'}</span>
+                </div>
+                <div class="info-row d-flex justify-content-between">
+                    <span class="info-label">Phone:</span>
+                    <span>${registration.phone || 'N/A'}</span>
+                </div>
+                <div class="info-row d-flex justify-content-between">
+                    <span class="info-label">Email:</span>
+                    <span>${registration.email || 'N/A'}</span>
+                </div>
+                <div class="info-row d-flex justify-content-between">
+                    <span class="info-label">Location:</span>
+                    <span>${registration.location || 'N/A'}</span>
+                </div>
+                <div class="info-row d-flex justify-content-between">
+                    <span class="info-label">How Heard:</span>
+                    <span>${registration.how_heard || 'N/A'}</span>
+                </div>
+                <div class="info-row d-flex justify-content-between">
+                    <span class="info-label">Registration Type:</span>
+                    <span>${registration.registration_type || 'N/A'}</span>
+                </div>
+                <div class="info-row d-flex justify-content-between">
+                    <span class="info-label">Marital Status:</span>
+                    <span>${registration.marital_status || 'N/A'}</span>
+                </div>
+                <div class="info-row d-flex justify-content-between">
+                    <span class="info-label">Coming with Spouse:</span>
+                    <span>${registration.coming_with_spouse || 'N/A'}</span>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="info-row d-flex justify-content-between">
+                    <span class="info-label">Previous Participation:</span>
+                    <span>${registration.previous_participation || 'N/A'}</span>
+                </div>
+                <div class="info-row d-flex justify-content-between">
+                    <span class="info-label">Source Type:</span>
+                    <span>${registration.source_type || 'N/A'}</span>
+                </div>
+                <div class="info-row d-flex justify-content-between">
+                    <span class="info-label">Group Name:</span>
+                    <span>${registration.group_name || 'N/A'}</span>
+                </div>
+                <div class="info-row d-flex justify-content-between">
+                    <span class="info-label">Group Size:</span>
+                    <span>${registration.group_size || 'N/A'}</span>
+                </div>
+                <div class="info-row d-flex justify-content-between">
+                    <span class="info-label">Confirmation Status:</span>
+                    <span>${registration.confirmed_reg || 'Pending'}</span>
+                </div>
+                <div class="info-row d-flex justify-content-between">
+                    <span class="info-label">Bible Group:</span>
+                    <span>${registration.bible_group || 'Not Assigned'}</span>
+                </div>
+                <div class="info-row d-flex justify-content-between">
+                    <span class="info-label">Receive Updates:</span>
+                    <span>${registration.receive_updates || 'N/A'}</span>
+                </div>
+                <div class="info-row d-flex justify-content-between">
+                    <span class="info-label">Created:</span>
+                    <span>${new Date(registration.created_at).toLocaleDateString()}</span>
+                </div>
+                <div class="info-row d-flex justify-content-between">
+                    <span class="info-label">Updated:</span>
+                    <span>${new Date(registration.updated_at).toLocaleDateString()}</span>
+                </div>
+            </div>
+        </div>
+        <div class="mt-3">
+            <div class="info-row">
+                <div class="info-label mb-2">Expectations:</div>
+                <div class="text-muted">${registration.expectations || 'N/A'}</div>
+            </div>
+            <div class="info-row mt-3">
+                <div class="info-label mb-2">Commitment:</div>
+                <div class="text-muted">${registration.commitment || 'N/A'}</div>
+            </div>
+        </div>
+    `;
+    }
+
+    // Confirm arrival function
+    function confirmArrival(registrationId, fullname) {
+        currentRegistrationId = registrationId;
+        document.getElementById('confirm-name').textContent = fullname;
+    }
+
+    // Handle confirmation
+    document.getElementById('proceedConfirm').addEventListener('click', function() {
+        if (!currentRegistrationId) return;
+
+        $.ajax({
+            url: `/confirm-arrival/${currentRegistrationId}`,
+            method: 'POST',
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            },
+            contentType: 'application/json',
+            data: JSON.stringify({
+                confirmed_reg: 'confirmed'
+            }),
+            success: function(response) {
+                if (response.success) {
+                    // Update the status badge
+                    const statusBadge = document.getElementById(`status-${currentRegistrationId}`);
+                    statusBadge.textContent = 'Confirmed';
+                    statusBadge.className = 'status-badge status-confirmed';
+
+                    // Update the data
+                    const registration = registrationsData.find(r => r.id == currentRegistrationId);
+                    if (registration) {
+                        registration.confirmed_reg = 'confirmed';
+                    }
+
+                    // Close modal
+                    const modal = bootstrap.Modal.getInstance(document.getElementById('confirmModal'));
+                    modal.hide();
+
+                    // Show success message
+                    Swal.fire({
+                        toast: true,
+                        icon: 'success',
+                        title: 'Arrival confirmed successfully!',
+                        position: 'top-end',
+                        showConfirmButton: false,
+                        timer: 3000,
+                        timerProgressBar: true
+                    });
+
+                    // Refresh page to update stats
+                    setTimeout(() => {
+                        location.reload();
+                    }, 1500);
+                } else {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: response.message || 'Failed to confirm arrival'
+                    });
+                }
+            },
+            error: function(xhr) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Server Error',
+                    text: 'Something went wrong! Please try again.'
+                });
+            }
+        });
+    });
+
+    // Export CSV functionality
+    document.getElementById('exportBtn').addEventListener('click', function() {
+        const headers = [
+            'ID', 'Full Name', 'Gender', 'Phone', 'Email', 'Location', 'How Heard',
+            'Previous Participation', 'Registration Type', 'Source Type', 'Marital Status',
+            'Coming with Spouse', 'Group Name', 'Group Size', 'Expectations', 'Commitment',
+            'Receive Updates', 'Confirmed Registration', 'Bible Group', 'Created At', 'Updated At'
+        ];
+
+        const rows = registrationsData.map(registration => [
+            registration.id,
+            registration.fullname || '',
+            registration.gender || '',
+            registration.phone || '',
+            registration.email || '',
+            registration.location || '',
+            registration.how_heard || '',
+            registration.previous_participation || '',
+            registration.registration_type || '',
+            registration.source_type || '',
+            registration.marital_status || '',
+            registration.coming_with_spouse || '',
+            registration.group_name || '',
+            registration.group_size || '',
+            registration.expectations || '',
+            registration.commitment || '',
+            registration.receive_updates || '',
+            registration.confirmed_reg || 'Pending',
+            registration.bible_group || 'Not Assigned',
+            registration.created_at || '',
+            registration.updated_at || ''
+        ].map(cell => `"${String(cell).replace(/"/g, '""')}"`));
+
+        const csvContent = [
+            headers.map(h => `"${h}"`).join(','),
+            ...rows.map(r => r.join(','))
+        ].join('\n');
+
+        const blob = new Blob([csvContent], { type: 'text/csv' });
         const url = URL.createObjectURL(blob);
 
-        const a = document.createElement("a");
+        const a = document.createElement('a');
         a.href = url;
-        a.download = "conference_submissions.csv";
+        a.download = `conference_submissions_${new Date().toISOString().split('T')[0]}.csv`;
         document.body.appendChild(a);
         a.click();
         document.body.removeChild(a);
+        URL.revokeObjectURL(url);
     });
-
-    // Set up filter dropdown clicks
-    document.querySelectorAll('[data-filter]').forEach(item => {
-        item.addEventListener('click', (e) => {
-            e.preventDefault();
-            currentFilter = e.target.dataset.filter;
-            applyFilter(currentFilter);
-
-            // Update dropdown button text
-            let filterText = 'All Submissions';
-            switch(currentFilter) {
-                case 'individual': filterText = 'Individual Only'; break;
-                case 'group': filterText = 'Groups Only'; break;
-                case 'source-miv': filterText = 'MIV Source'; break;
-                case 'source-lst': filterText = 'LST Source'; break;
-                case 'updates-yes': filterText = 'Receiving Updates'; break;
-                case 'updates-no': filterText = 'Not Receiving Updates'; break;
-            }
-            document.getElementById('filterDropdown').innerHTML = `<i class="bi bi-funnel me-1"></i>${filterText}`;
-        });
-    });
-
-    // Init
-    updateStats();
-    displayRows(allRows);
-    updatePagination(allRows);
-    showingCountEl.textContent = Math.min(rowsPerPage, allRows.length);
-    totalCountEl.textContent = allRows.length;
 </script>
 
 </body>
