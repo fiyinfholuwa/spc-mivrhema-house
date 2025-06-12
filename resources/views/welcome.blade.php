@@ -49,6 +49,7 @@
                 <li><a data-scroll href="#partner">Partner</a></li>
                 <!-- <li><a data-scroll href="#">Sponsorship</a></li> -->
                 <li><a data-scroll href="#faq">FAQ</a></li>
+                <li><a  href="{{route('feedback')}}">Feedback</a></li>
                 @auth
                     <li><a  href="{{route('dashboard')}}">Dashboard</a></li>
 

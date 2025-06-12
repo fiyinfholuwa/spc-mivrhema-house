@@ -209,6 +209,10 @@
             <a style="background-color: royalblue; color: white" href="{{ route('home') }}" class="btn btn-export">
                 <i class="bi bi-globe2 me-2"></i>Visit Website
             </a>
+
+            <a style="background-color: black; color: white" href="{{ route('get.feedback') }}" class="btn btn-export">
+                <i class="bi-chat-left-text	 me-2"></i>View Feedback
+            </a>
             <button id="exportBtn" class="btn btn-export btn-success">
                 <i class="bi bi-download me-2"></i>Export CSV
             </button>

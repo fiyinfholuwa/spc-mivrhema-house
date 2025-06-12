@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\ConferenceFeedback;
 use App\Models\ConferenceRegistration;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -13,6 +14,9 @@ class FrontendController extends Controller
 {
     public function home(){
         return view('welcome');
+    }
+    public function feedback(){
+        return view('feedback');
     }
 
     public function store(Request $request)
@@ -44,6 +48,11 @@ class FrontendController extends Controller
     {
         $registrations = ConferenceRegistration::orderByDesc('id')->get();
         return view('get_data', compact('registrations'));
+    }
+    public function showRegistrationsPageFeedback()
+    {
+        $registrations = ConferenceFeedback::orderByDesc('id')->get();
+        return view('get_feeback', compact('registrations'));
     }
 
 
@@ -118,5 +127,42 @@ class FrontendController extends Controller
             'assigned_group' => $registration->bible_group
         ]);
     }
+
+
+    public function submit(Request $request)
+    {
+        $validated = $request->validate([
+            'full_name' => 'required|string|max:255',
+            'email' => 'nullable|email',
+            'rating_overall' => 'required|string',
+            'spiritual_impact' => 'required|string',
+            'highlight_sessions' => 'nullable|string',
+            'content_quality' => 'required|string',
+            'speaker_rating' => 'required|string',
+            'logistics' => 'nullable|string',
+            'venue_rating' => 'nullable|string',
+            'attend_again' => 'required|string',
+            'improvements' => 'nullable|string',
+            'testimonies' => 'nullable|string',
+        ]);
+
+        // Check if a feedback already exists for this name or email
+        $exists = ConferenceFeedback::where('full_name', $validated['full_name'])
+            ->when($validated['email'], function ($query) use ($validated) {
+                return $query->orWhere('email', $validated['email']);
+            })
+            ->exists();
+
+        if ($exists) {
+            return response()->json([
+                'message' => 'You have already submitted feedback. Thank you!',
+            ], 409); // 409 Conflict
+        }
+
+        ConferenceFeedback::create($validated);
+
+        return response()->json(['message' => 'Thank you for your detailed feedback!']);
+    }
+
 
 }
