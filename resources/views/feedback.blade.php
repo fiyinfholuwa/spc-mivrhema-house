@@ -227,7 +227,7 @@
 
             <!-- Follow Up -->
             <div class="form-group">
-                <label>Would you like to attend future conferences by Prosperous Ministry?</label>
+                <label>Would you like to attend future conferences by LST/MIV Rhema House Ministry?</label>
                 <select name="attend_again" class="form-control" required>
                     <option value="">-- Select --</option>
                     <option>Yes, definitely</option>
