@@ -68,7 +68,7 @@
 
 
 
-        <p id="themeText" class="theme-text">Theme: A Compelling Conviction</p>
+{{--        <p id="themeText" class="theme-text">Theme: A Compelling Conviction</p>--}}
 <style>
     .theme-text {
         font-size: 1.5rem;
