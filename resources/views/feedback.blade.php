@@ -112,14 +112,6 @@
 
 </style>
 
-        <script>
-            window.addEventListener('load', () => {
-                const text = document.getElementById('themeText');
-                text.classList.remove('fadeInUp');
-                void text.offsetWidth; // force reflow
-                text.classList.add('theme-text'); // re-trigger
-            });
-        </script>
 
 
     </div>
