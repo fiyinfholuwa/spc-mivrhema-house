@@ -5,6 +5,21 @@ use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 
 
+use Illuminate\Support\Facades\Mail;
+
+Route::get('/test-mail', function () {
+    try {
+        Mail::raw('SMTP test successful! 🎉', function ($message) {
+            $message->to('fiyinfholuwa@gmail.com')
+                    ->subject('Mail Test from LST');
+        });
+
+        return '✅ Mail sent successfully!';
+    } catch (\Exception $e) {
+        return '❌ Mail sending failed: ' . $e->getMessage();
+    }
+});
+
 
 Route::get('/', [FrontendController::class, 'home'])->name('home');
 Route::get('/spc-2025-feedback', [FrontendController::class, 'feedback'])->name('feedback');

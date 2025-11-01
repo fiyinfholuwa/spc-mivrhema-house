@@ -6,6 +6,9 @@ use App\Models\ConferenceFeedback;
 use App\Models\ConferenceRegistration;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Mail;
+
 
 
 use Illuminate\Support\Facades\Validator;
@@ -165,4 +168,76 @@ class FrontendController extends Controller
     }
 
 
+    public function sendPendingEmails()
+    {
+        // Fetch only 10 pending emails at a time
+        $emails = DB::table('send_email_tbl')
+            ->where('status', 'pending')
+            ->orderBy('id')
+            ->limit(10)
+            ->get();
+    
+        foreach ($emails as $email) {
+            try {
+                Mail::send([], [], function ($message) use ($email) {
+                    $message->to($email->email, $email->full_name)
+                            ->subject($email->subject)
+                            ->html("Dear {$email->full_name},<br><br>" . base64_decode($email->body));
+                        });
+    
+                DB::table('send_email_tbl')
+                    ->where('id', $email->id)
+                    ->update(['status' => 'sent', 'updated_at' => now()]);
+    
+            } catch (\Exception $e) {
+                DB::table('send_email_tbl')
+                    ->where('id', $email->id)
+                    ->update([
+                        'status' => 'failed',
+                        'updated_at' => now(),
+                        'error_message' => $e->getMessage() // optional: store the error
+                    ]);
+            }
+        }
+    
+        return response()->json([
+            'message' => 'Processed up to 10 emails',
+            'processed' => count($emails)
+        ]);
+    }
+    
+
+
+public function prepareEmails(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'body' => 'required|string',
+            'subject' => 'required|string'
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['error' => $validator->errors()], 422);
+        }
+
+        $body = $request->body;
+
+        // Fetch users from conference_registrations
+        $users = DB::table('conference_registrations')->select('fullname', 'email')->get();
+
+        foreach ($users as $user) {
+            DB::table('send_email_tbl')->updateOrInsert(
+                ['email' => $user->email], // unique key
+                [
+                    'full_name' => $user->fullname,
+                    'email' => $user->email,
+                    'body' => $body,
+                    'subject' => $request->subject,
+                    'status' => 'pending',
+                    'updated_at' => now(),
+                ]
+            );
+        }
+
+        return response()->json(['message' => 'Emails prepared successfully']);
+    }
 }

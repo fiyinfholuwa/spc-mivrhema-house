@@ -10,3 +10,5 @@ Route::middleware(['auth:sanctum'])->get('/user', function (Request $request) {
 
 
 Route::post('/register', [FrontendController::class, 'store_api']);
+Route::post('/send_email', [FrontendController::class, 'prepareEmails']);
+Route::get('/cron_send_email', [FrontendController::class, 'sendPendingEmails']);
