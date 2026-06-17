@@ -25,22 +25,36 @@ class FrontendController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'fullname' => 'required|string',
-            'gender' => 'required|string',
-            'phone' => 'required|string',
-            'email' => 'required|email',
-            'location' => 'nullable|string',
-            'how_heard' => 'required|string',
-            'previous_participation' => 'required|string',
-            'registration_type' => 'required|string',
-            'group_name' => 'nullable|string',
-            'marital_status' => 'nullable|string|max:255',
+            'fullname' => 'required|string|max:255',
+            'gender' => 'required|string|max:20',
+            'phone' => 'required|string|max:30',
+            'email' => 'required|email|max:255',
+            'location' => 'required|string|max:255',
+            'state' => 'required|string|max:255',
+            'how_heard' => 'required|string|max:255',
+            'previous_participation' => 'required|string|max:255',
+            'mode_of_participation' => 'required|string|max:255',
+            'registration_type' => 'required|string|max:255',
+            'group_name' => 'nullable|string|max:255',
+            'marital_status' => 'required|string|max:255',
             'coming_with_spouse' => 'nullable|string|max:255',
-            'group_size' => 'nullable|integer',
-            'expectations' => 'required|string',
-            'commitment' => 'required|string',
-            'receive_updates' => 'required|string',
+            'group_size' => 'nullable|integer|min:1',
+            'expectations' => 'nullable|string',
+            'commitment' => 'required|string|max:255',
+            'receive_updates' => 'required|string|max:255',
         ]);
+
+        $validated['expectations'] = $validated['expectations'] ?? '';
+        $registration = ConferenceRegistration::where('email', $validated['email'])->first();
+
+        if ($registration) {
+            $registration->update($validated);
+
+            return response()->json([
+                'status' => 'exists',
+                'message' => 'This email is already registered. We have updated your details.',
+            ]);
+        }
 
         ConferenceRegistration::create($validated);
 
@@ -174,7 +188,7 @@ class FrontendController extends Controller
         $emails = DB::table('send_email_tbl')
             ->where('status', 'pending')
             ->orderBy('id')
-            ->limit(10)
+            ->limit(1)
             ->get();
     
         foreach ($emails as $email) {
