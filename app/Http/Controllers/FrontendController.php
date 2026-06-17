@@ -34,6 +34,7 @@ class FrontendController extends Controller
             'how_heard' => 'required|string|max:255',
             'previous_participation' => 'required|string|max:255',
             'mode_of_participation' => 'required|string|max:255',
+            'accommodation_preference' => 'nullable|string|max:255',
             'registration_type' => 'required|string|max:255',
             'group_name' => 'nullable|string|max:255',
             'marital_status' => 'required|string|max:255',

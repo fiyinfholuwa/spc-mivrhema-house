@@ -825,10 +825,19 @@
                 </div>
                 <div class="form-field">
                     <label for="mode_of_participation">Mode of Participation <span class="req">*</span></label>
-                    <select id="mode_of_participation" name="mode_of_participation" required>
+                    <select id="mode_of_participation" name="mode_of_participation" required onchange="toggleAccommodation(this)">
                         <option value="">Select an option</option>
-                        <option value="in-person">In-Person</option>
-                        <option value="online">Online</option>
+                        <option value="physical">Physical</option>
+                        <option value="virtual">Virtual</option>
+                    </select>
+                </div>
+                <div id="accommodation-field" class="form-field" style="display:none;">
+                    <label for="accommodation_preference">Accommodation Arrangement <span class="req">*</span></label>
+                    <select id="accommodation_preference" name="accommodation_preference">
+                        <option value="">Select an option</option>
+                        <option value="own-accommodation">I have accommodation close to the venue</option>
+                        <option value="conference-accommodation">I want the conference accommodation (provided)</option>
+                        <option value="hotel-booking">Please help me book a hotel</option>
                     </select>
                 </div>
                 <div class="form-field">
@@ -957,6 +966,19 @@
         if (!isOpen) item.classList.add('open');
     }
 
+    function toggleAccommodation(select) {
+        var field = document.getElementById('accommodation-field');
+        var accSelect = document.getElementById('accommodation_preference');
+        if (select.value === 'physical') {
+            field.style.display = 'block';
+            accSelect.setAttribute('required', 'required');
+        } else {
+            field.style.display = 'none';
+            accSelect.removeAttribute('required');
+            accSelect.value = '';
+        }
+    }
+
     function toggleGroup(select) {
         document.getElementById('group-details').style.display = select.value === 'group' ? 'block' : 'none';
     }
@@ -1002,6 +1024,7 @@
                 $('#registration-form')[0].reset();
                 document.getElementById('group-details').style.display = 'none';
                 document.getElementById('spouse-field').style.display = 'none';
+                document.getElementById('accommodation-field').style.display = 'none';
                 document.getElementById('reg-success').style.display = 'block';
                 openWhatsAppModal(res.message);
                 btn.disabled = false;
