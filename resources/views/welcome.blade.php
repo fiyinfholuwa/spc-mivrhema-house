@@ -636,15 +636,15 @@
                 <div class="l-icon"><i class="fas fa-calendar-alt"></i></div>
                 <h3>Schedule</h3>
                 <div class="sched-row">
-                    <span class="date">June 20</span>
+                    <span class="date">August 20</span>
                     <span class="time">4:00 PM &ndash; 8:00 PM</span>
                 </div>
                 <div class="sched-row">
-                    <span class="date">June 21&ndash;22</span>
+                    <span class="date">August 21&ndash;22</span>
                     <span class="time">8:00 AM &ndash; 8:00 PM</span>
                 </div>
                 <div class="sched-row">
-                    <span class="date">June 23</span>
+                    <span class="date">August 23</span>
                     <span class="time">8:00 AM &ndash; 2:00 PM</span>
                 </div>
             </div>
@@ -739,7 +739,7 @@
     <div class="reg-inner">
         <span class="reg-badge">Sexual Purity Conference 2026</span>
         <h2 class="reg-title">Register Now</h2>
-        <p class="reg-desc">Join us for a life-transforming encounter with God. Admission is free, but registration is compulsory to help us plan. Arrival: 4:00 PM on Friday, June 20, 2026.</p>
+        <p class="reg-desc">Join us for a life-transforming encounter with God. Admission is free, but registration is compulsory to help us plan. Arrival: 4:00 PM on Friday, August 20, 2026.</p>
 
         <form id="registration-form">
             @csrf
