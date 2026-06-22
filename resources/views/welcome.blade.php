@@ -940,8 +940,7 @@
 
     <p style="margin:10px auto;line-height:1.7;max-width:700px;">
         <strong>Address:</strong><br>
-        Besliz Ivy Hotel &amp; Resort, Aduloju Estate, Power House Bus Stop
-        (Behind A3 Hotel), Akobo, Ibadan.
+      Cecillia Building, Beside Monarch Plaza, Adjacent Omololu Hospital, Ojurin-Akobo, Ibadan, Nigeria. 
     </p>
 
     <div style="margin-top:25px;padding-top:15px;border-top:1px solid rgba(255,255,255,0.15);">
