@@ -812,6 +812,9 @@
                         <option value="social-media">Social Media</option>
                         <option value="friend-family">Friend / Family</option>
                         <option value="whatsapp-group">WhatsApp Group</option>
+                        <option value="billboard">Billboard</option>
+                        <option value="banner">Banner</option>
+                        <option value="handbill">Handbill</option>
                         <option value="other">Other</option>
                     </select>
                 </div>
