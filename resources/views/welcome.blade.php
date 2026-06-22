@@ -927,18 +927,38 @@
 </section>
 
 <!-- FOOTER -->
-<footer class="footer">
-    <div class="footer-grid">
-        
+<footer style="background:#111;color:#fff;padding:40px 20px 20px;text-align:center;">
+    
+    <h3 style="margin-bottom:15px;font-size:24px;">Contact Us</h3>
 
-        
+    <p style="margin:10px 0;line-height:1.7;">
+        <strong>Phone:</strong>
+        <a href="tel:+2347066722832" style="color:red;text-decoration:none;">
+            +234 706 672 2832
+        </a>
+    </p>
+
+    <p style="margin:10px auto;line-height:1.7;max-width:700px;">
+        <strong>Address:</strong><br>
+        Besliz Ivy Hotel &amp; Resort, Aduloju Estate, Power House Bus Stop
+        (Behind A3 Hotel), Akobo, Ibadan.
+    </p>
+
+    <div style="margin-top:25px;padding-top:15px;border-top:1px solid rgba(255,255,255,0.15);">
+        <p style="margin:5px 0;">
+            Developed by
+            <a href="https://mivrhemahouse.org.ng" target="_blank"
+               style="color:red;text-decoration:none;">
+                MIV Rhema House Media
+            </a>
+        </p>
+
+        <p style="margin:5px 0;">
+            &copy; 2026 Sexual Purity Conference. All Rights Reserved.
+        </p>
     </div>
-    <div class="footer-bottom">
-        <p>Developed by <a href="#">MIV Rhema House Media</a></p>
-        <p>&copy; 2026 Sexual Purity Conference. All rights reserved.</p>
-    </div>
+
 </footer>
-
 <!-- WHATSAPP MODAL -->
 <div class="modal-overlay" id="whatsapp-modal" aria-hidden="true" role="dialog" aria-labelledby="whatsapp-modal-title">
     <div class="modal-box">
