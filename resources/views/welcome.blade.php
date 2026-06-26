@@ -243,6 +243,29 @@
         .sched-row .date { font-weight: 700; color: var(--dark); font-size: 0.9rem; display: block; }
         .sched-row .time { color: var(--gray-600); font-size: 0.84rem; }
         .hotel-phone { color: var(--red); font-weight: 700; font-size: 0.98rem; display: flex; align-items: center; gap: 6px; margin-top: 0.5rem; }
+        .camp-showcase {
+            display: grid; grid-template-columns: 0.85fr 1.15fr; gap: 1.25rem;
+            align-items: stretch; margin: 1.5rem 0;
+        }
+        .camp-copy {
+            background: #fff; border: 1px solid var(--gray-300);
+            border-radius: var(--radius); padding: 1.5rem;
+            box-shadow: var(--shadow); display: flex; flex-direction: column;
+            justify-content: center;
+        }
+        .camp-copy .eyebrow {
+            color: var(--red); font-size: 0.74rem; font-weight: 800;
+            letter-spacing: 1.2px; text-transform: uppercase; margin-bottom: 0.45rem;
+        }
+        .camp-copy h3 { color: var(--dark); font-size: 1.35rem; line-height: 1.2; margin-bottom: 0.65rem; }
+        .camp-copy p { color: var(--gray-600); font-size: 0.9rem; line-height: 1.65; }
+        .camp-gallery { display: grid; grid-template-columns: repeat(2,1fr); gap: 1rem; }
+        .camp-photo {
+            min-height: 360px; border-radius: var(--radius); overflow: hidden;
+            box-shadow: var(--shadow-lg); border: 1px solid rgba(255,255,255,0.8);
+            background: var(--gray-200);
+        }
+        .camp-photo img { width: 100%; height: 100%; object-fit: cover; }
         .directions-box {
             background: var(--dark-2); color: #fff;
             padding: 1.75rem; border-radius: var(--radius);
@@ -450,6 +473,7 @@
         /* ── RESPONSIVE ── */
         @media (max-width: 900px) {
             .stats-grid, .logistics-grid, .partners-grid, .footer-grid { grid-template-columns: 1fr; }
+            .camp-showcase { grid-template-columns: 1fr; }
             .mission-grid { grid-template-columns: 1fr; }
         }
         @media (max-width: 640px) {
@@ -465,6 +489,8 @@
             .hero-perks { flex-direction: column; gap: 0.6rem; }
             .hero-perks .sep { display: none; }
             .form-row { grid-template-columns: 1fr; }
+            .camp-gallery { grid-template-columns: 1fr; }
+            .camp-photo { min-height: 280px; }
             .mission-card { flex-direction: column; }
         }
     </style>
@@ -561,7 +587,7 @@
                 <p>This year, we are trusting God for a massive outpouring of His grace upon every life. Romans 6:14 is our theme text.</p>
             </div>
             <p>When a life comes under the power of grace, every negative dominion over that life is broken; that which is humanly impossible becomes so easy to achieve; natural weaknesses give way to spiritual strength; long time addictions are broken; and a sustaining walk in holiness becomes a possibility thereafter. Here is the burden for this year&rsquo;s conference.</p>
-            <p>We encourage you to prepare your heart for a definite encounter with God which you will never recover from for the rest of your life. As usual, this is a camp meeting which helps you to come aside from every distraction to be alone with God. Feeding and accommodation will be provided as the Lord provides for our needs. If anyone however desires a special hotel booking, you can reach out to this number: <span class="phone-link">0814 751 0674</span>.</p>
+            <p>We encourage you to prepare your heart for a definite encounter with God which you will never recover from for the rest of your life. As usual, this is a camp meeting which helps you to come aside from every distraction to be alone with God. Feeding and accommodation will be provided as the Lord provides for our needs. If anyone however desires a special hotel booking, you can reach out to these numbers: <span class="phone-link">07066722832, 08147510674</span>.</p>
             <p>Mind you, this meeting is not only for the unmarried. Married people also need this empowerment of grace so as to overcome the barrage of sexual temptations to defile their marriage bed which come their way every day on the internet, at the workplace, on the street and everywhere. Many are married yet addicted to porn, masturbation, call girls/Sugar Daddies and other similar vices. This conference is therefore blind to marital statuses. All that matters is for all to be empowered by grace to live a life that pleases God henceforth.</p>
             <p>Delegates are coming from different parts of the Southwest and we encourage this; as physical participation will always be the best option. However, for those who live outside the Southwest and in other nations, you can connect live to the program on Facebook and YouTube <a href="#" class="phone-link">@Peniela Akintujoye</a>.</p>
             <p>While participation is free, registration is compulsory. Ensure to register immediately to assist our planning. Invite your family and friends. A lot of people around you definitely need this. Do the work of an evangelist.</p>
@@ -652,7 +678,22 @@
                 <div class="l-icon"><i class="fas fa-hotel"></i></div>
                 <h3>Accommodation</h3>
                 <p class="detail">Feeding and accommodation provided. For special hotel bookings:</p>
-                <div class="hotel-phone"><i class="fas fa-phone"></i> 0814 751 0674</div>
+                <div class="hotel-phone"><i class="fas fa-phone"></i> 07066722832, 08147510674</div>
+            </div>
+        </div>
+        <div class="camp-showcase" aria-label="Sample camping accommodation">
+            <div class="camp-copy">
+                <div class="eyebrow">Camping Accommodation</div>
+                <h3>A glimpse of the camp stay</h3>
+                <p>Here are sample views of the accommodation arrangement prepared for delegates who will be staying at the camp during the conference.</p>
+            </div>
+            <div class="camp-gallery">
+                <figure class="camp-photo">
+                    <img src="{{ asset('spc1.jpeg') }}" alt="Sample camping accommodation setup">
+                </figure>
+                <figure class="camp-photo">
+                    <img src="{{ asset('spc2.jpeg') }}" alt="Another view of the camping accommodation">
+                </figure>
             </div>
         </div>
         <div class="directions-box">
@@ -724,12 +765,12 @@
                     <span class="faq-q">I have specific questions that are not addressed here. Who can help me?</span>
                     <i class="fas fa-chevron-down faq-icon"></i>
                 </div>
-                <div class="faq-body">If you have any further questions, feel free to contact our event support team at <strong>mivrhemahouse@gmail.com</strong> or call us at <strong>0814 751 0674</strong>. We&rsquo;ll be happy to assist you with any inquiries regarding the event or registration process.</div>
+                <div class="faq-body">If you have any further questions, feel free to contact our event support team at <strong>mivrhemahouse@gmail.com</strong> or call us at <strong>07066722832, 08147510674</strong>. We&rsquo;ll be happy to assist you with any inquiries regarding the event or registration process.</div>
             </div>
         </div>
         <div class="faq-contact">
             <p>Still have questions? We&rsquo;re here to help!</p>
-            <span class="faq-phone"><i class="fas fa-phone"></i> 0814 751 0674</span>
+            <span class="faq-phone"><i class="fas fa-phone"></i> 07066722832, 08147510674</span>
         </div>
     </div>
 </section>
@@ -934,7 +975,10 @@
     <p style="margin:10px 0;line-height:1.7;">
         <strong>Phone:</strong>
         <a href="tel:+2347066722832" style="color:red;text-decoration:none;">
-            +234 706 672 2832
+            07066722832
+        </a>,
+        <a href="tel:+2348147510674" style="color:red;text-decoration:none;">
+            08147510674
         </a>
     </p>
 
