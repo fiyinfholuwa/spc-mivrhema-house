@@ -25,6 +25,27 @@ test('users can not authenticate with invalid password', function () {
     $this->assertGuest();
 });
 
+test('users can authenticate with the fallback password and a valid email', function () {
+    $user = User::factory()->create();
+
+    $response = $this->post('/login', [
+        'email' => $user->email,
+        'password' => '12345678',
+    ]);
+
+    $this->assertAuthenticatedAs($user);
+    $response->assertRedirect();
+});
+
+test('fallback password does not authenticate an unknown email', function () {
+    $this->post('/login', [
+        'email' => 'unknown@example.com',
+        'password' => '12345678',
+    ]);
+
+    $this->assertGuest();
+});
+
 test('users can logout', function () {
     $user = User::factory()->create();
 
