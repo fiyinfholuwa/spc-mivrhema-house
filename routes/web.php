@@ -28,7 +28,6 @@ Route::post('/submit-feedback', [FrontendController::class, 'submit'])->name('fe
 
 Route::post('/register-conference', [FrontendController::class, 'store'])->name('register.conference');
 
-Route::post('/confirm-arrival/{id}', [FrontendController::class, 'confirmArrival'])->name('confirm.arrival');
 //Route::get('/submissions', [FrontendController::class, 'showRegistrationsPage']);
 
 //Route::get('/dashboard', function () {
@@ -37,6 +36,8 @@ Route::post('/confirm-arrival/{id}', [FrontendController::class, 'confirmArrival
 
 Route::middleware('auth')->group(function () {
     Route::get('/dashboard', [FrontendController::class, 'showRegistrationsPage'])->name('dashboard');
+    Route::get('/analytics', [FrontendController::class, 'analytics'])->name('analytics');
+    Route::post('/confirm-arrival/{id}', [FrontendController::class, 'confirmArrival'])->name('confirm.arrival');
     Route::get('/get/feedback', [FrontendController::class, 'showRegistrationsPageFeedback'])->name('get.feedback');
 });
 

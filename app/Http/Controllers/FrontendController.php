@@ -62,15 +62,128 @@ class FrontendController extends Controller
         return response()->json(['status' => 'success', 'message' => 'Registration successful.']);
     }
 
-    public function showRegistrationsPage()
+    public function showRegistrationsPage(Request $request)
     {
-        $registrations = ConferenceRegistration::orderByDesc('id')->get();
-        return view('get_data', compact('registrations'));
+        $query = ConferenceRegistration::query();
+
+        if ($search = trim((string) $request->query('search'))) {
+            $query->where(function ($builder) use ($search) {
+                $builder->where('fullname', 'like', "%{$search}%")
+                    ->orWhere('email', 'like', "%{$search}%")
+                    ->orWhere('phone', 'like', "%{$search}%")
+                    ->orWhere('location', 'like', "%{$search}%")
+                    ->orWhere('state', 'like', "%{$search}%")
+                    ->orWhere('group_name', 'like', "%{$search}%");
+            });
+        }
+
+        if ($status = $request->query('status')) {
+            $status === 'pending'
+                ? $query->where(function ($builder) {
+                    $builder->whereNull('confirmed_reg')->orWhere('confirmed_reg', 'pending');
+                })
+                : $query->where('confirmed_reg', $status);
+        }
+
+        if ($type = $request->query('type')) {
+            $query->where('registration_type', $type);
+        }
+
+        $registrations = $query->orderByDesc('id')->paginate(12)->withQueryString();
+        $stats = [
+            'total' => ConferenceRegistration::count(),
+            'confirmed' => ConferenceRegistration::where('confirmed_reg', 'confirmed')->count(),
+            'pending' => ConferenceRegistration::whereNull('confirmed_reg')->orWhere('confirmed_reg', 'pending')->count(),
+            'assigned' => ConferenceRegistration::whereNotNull('bible_group')->where('bible_group', '!=', '')->count(),
+            'individual' => ConferenceRegistration::where('registration_type', 'individual')->count(),
+            'group' => ConferenceRegistration::where('registration_type', 'group')->count(),
+        ];
+
+        if ($request->ajax() || $request->expectsJson()) {
+            return response()->json(['registrations' => $registrations, 'stats' => $stats]);
+        }
+
+        return view('get_data', compact('registrations', 'stats'));
     }
-    public function showRegistrationsPageFeedback()
+    public function showRegistrationsPageFeedback(Request $request)
     {
-        $registrations = ConferenceFeedback::orderByDesc('id')->get();
-        return view('get_feeback', compact('registrations'));
+        $query = ConferenceFeedback::query();
+
+        if ($search = trim((string) $request->query('search'))) {
+            $query->where(function ($builder) use ($search) {
+                $builder->where('full_name', 'like', "%{$search}%")
+                    ->orWhere('email', 'like', "%{$search}%")
+                    ->orWhere('rating_overall', 'like', "%{$search}%")
+                    ->orWhere('spiritual_impact', 'like', "%{$search}%")
+                    ->orWhere('content_quality', 'like', "%{$search}%")
+                    ->orWhere('speaker_rating', 'like', "%{$search}%")
+                    ->orWhere('testimonies', 'like', "%{$search}%");
+            });
+        }
+
+        if ($rating = $request->query('rating')) {
+            $query->where('rating_overall', $rating);
+        }
+
+        $registrations = $query->orderByDesc('id')->paginate(12)->withQueryString();
+        $stats = [
+            'total' => ConferenceFeedback::count(),
+            'excellent' => ConferenceFeedback::where('rating_overall', 'like', '%excellent%')->count(),
+            'high_impact' => ConferenceFeedback::where(function ($builder) {
+                $builder->where('spiritual_impact', 'like', '%high%')
+                    ->orWhere('spiritual_impact', 'like', '%very%');
+            })->count(),
+            'attend_again' => ConferenceFeedback::where('attend_again', 'like', 'yes%')->count(),
+            'inspiring' => ConferenceFeedback::where('speaker_rating', 'like', '%inspiring%')->count(),
+            'exceptional' => ConferenceFeedback::where('content_quality', 'like', '%exceptional%')->count(),
+        ];
+
+        if ($request->ajax() || $request->expectsJson()) {
+            return response()->json(['feedback' => $registrations, 'stats' => $stats]);
+        }
+
+        return view('get_feeback', compact('registrations', 'stats'));
+    }
+
+    public function analytics()
+    {
+        $registrations = ConferenceRegistration::select([
+            'mode_of_participation',
+            'gender',
+            'how_heard',
+            'marital_status',
+        ])->get();
+
+        $groupCounts = function (string $field) use ($registrations) {
+            return $registrations
+                ->map(function ($registration) use ($field) {
+                    $value = trim((string) $registration->{$field});
+
+                    return $value === '' ? 'Not specified' : ucfirst(strtolower($value));
+                })
+                ->countBy()
+                ->sortDesc()
+                ->all();
+        };
+
+        $virtualCount = $registrations->filter(function ($registration) {
+            return strtolower(trim((string) $registration->mode_of_participation)) === 'virtual';
+        })->count();
+
+        $analytics = [
+            'participation' => [
+                'Virtual' => $virtualCount,
+                'Physical' => $registrations->count() - $virtualCount,
+            ],
+            'gender' => $groupCounts('gender'),
+            'how_heard' => $groupCounts('how_heard'),
+            'marital_status' => $groupCounts('marital_status'),
+        ];
+
+        return view('analytics', [
+            'analytics' => $analytics,
+            'total' => $registrations->count(),
+        ]);
     }
 
 
@@ -142,7 +255,8 @@ class FrontendController extends Controller
 
         return response()->json([
             'success' => true,
-            'assigned_group' => $registration->bible_group
+            'assigned_group' => $registration->bible_group,
+            'registration' => $registration->fresh(),
         ]);
     }
 
