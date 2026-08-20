@@ -809,8 +809,8 @@
                         <input type="tel" id="phone" name="phone" placeholder="Enter your phone number" required>
                     </div>
                     <div class="form-field">
-                        <label for="email">Email Address <span class="req">*</span></label>
-                        <input type="email" id="email" name="email" placeholder="Enter your email" required>
+                        <label for="email">Email Address <span class="optional">(Optional)</span></label>
+                        <input type="email" id="email" name="email" placeholder="Enter your email">
                     </div>
                 </div>
                 <div class="form-row">

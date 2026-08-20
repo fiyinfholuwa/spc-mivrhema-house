@@ -28,7 +28,7 @@ class FrontendController extends Controller
             'fullname' => 'required|string|max:255',
             'gender' => 'required|string|max:20',
             'phone' => 'required|string|max:30',
-            'email' => 'required|email|max:255',
+            'email' => 'nullable|email|max:255',
             'location' => 'required|string|max:255',
             'state' => 'required|string|max:255',
             'how_heard' => 'required|string|max:255',
@@ -46,7 +46,10 @@ class FrontendController extends Controller
         ]);
 
         $validated['expectations'] = $validated['expectations'] ?? '';
-        $registration = ConferenceRegistration::where('email', $validated['email'])->first();
+        $validated['email'] = $validated['email'] ?? null;
+        $registration = $validated['email']
+            ? ConferenceRegistration::where('email', $validated['email'])->first()
+            : null;
 
         if ($registration) {
             $registration->update($validated);
@@ -194,7 +197,7 @@ class FrontendController extends Controller
             'fullname' => 'required|string|max:255',
             'gender' => 'required|string|max:10',
             'phone' => 'required|string|max:20',
-            'email' => 'required|email|max:255',
+            'email' => 'nullable|email|max:255',
             'location' => 'nullable|string|max:255',
             'how_heard' => 'required|string|max:255',
             'previous_participation' => 'required|string|max:255',
