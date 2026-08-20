@@ -155,7 +155,7 @@ class FrontendController extends Controller
             'gender',
             'how_heard',
             'marital_status',
-        ])->get();
+        ])->where('confirmed_reg', 'confirmed')->get();
 
         $groupCounts = function (string $field) use ($registrations) {
             return $registrations

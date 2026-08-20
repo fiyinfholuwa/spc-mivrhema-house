@@ -16,7 +16,7 @@
 <header class="topbar"><div class="container-fluid px-3 px-md-4 py-3 d-flex align-items-center justify-content-between"><div class="d-flex align-items-center gap-3"><div class="brand-mark"><i class="bi bi-bar-chart-fill"></i></div><div><div class="fw-bold">SPC Analytics</div><div class="text-secondary small">Registration insights</div></div></div><a href="{{ route('dashboard') }}" class="soft-btn"><i class="bi bi-arrow-left me-md-2"></i><span class="top-label">Back to dashboard</span></a></div></header>
 
 <main class="page-shell">
-    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-end gap-3 mb-4"><div><div class="eyebrow mb-2">Audience insights</div><h1 class="page-title h2 mb-1">Registration analytics</h1><p class="text-secondary mb-0">A clear breakdown of all {{ number_format($total) }} submitted registrations.</p></div><span class="total-pill"><i class="bi bi-database"></i>{{ number_format($total) }} total records</span></div>
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-end gap-3 mb-4"><div><div class="eyebrow mb-2">Confirmed audience insights</div><h1 class="page-title h2 mb-1">Confirmed attendee analytics</h1><p class="text-secondary mb-0">A clear breakdown of {{ number_format($total) }} confirmed attendees.</p></div><span class="total-pill"><i class="bi bi-person-check-fill"></i>{{ number_format($total) }} confirmed</span></div>
 
     @php
         $findCount = function ($items, $wanted) {
@@ -41,7 +41,7 @@
 
     <div class="row g-3 mb-4">
         @foreach($highlights as [$label,$count,$icon,$background,$color])
-            <div class="col-6 col-lg-3"><div class="summary"><div class="d-flex justify-content-between"><div class="summary-label">{{ $label }}</div><div class="summary-icon" style="background:{{ $background }};color:{{ $color }}"><i class="bi bi-{{ $icon }}"></i></div></div><div class="summary-value">{{ number_format($count) }}</div><div class="summary-note">{{ $total ? number_format(($count / $total) * 100, 1) : 0 }}% of all registrations</div></div></div>
+            <div class="col-6 col-lg-3"><div class="summary"><div class="d-flex justify-content-between"><div class="summary-label">{{ $label }}</div><div class="summary-icon" style="background:{{ $background }};color:{{ $color }}"><i class="bi bi-{{ $icon }}"></i></div></div><div class="summary-value">{{ number_format($count) }}</div><div class="summary-note">{{ $total ? number_format(($count / $total) * 100, 1) : 0 }}% of confirmed attendees</div></div></div>
         @endforeach
     </div>
 
