@@ -150,50 +150,57 @@ class FrontendController extends Controller
 
     public function analytics()
     {
-        $confirmedRegistrations = ConferenceRegistration::where('confirmed_reg', 'confirmed');
-        $registrations = (clone $confirmedRegistrations)->select([
+        $allRegistrations = ConferenceRegistration::select([
             'mode_of_participation',
             'gender',
             'how_heard',
             'marital_status',
+            'confirmed_reg',
         ])->get();
+        $confirmedRegistrations = $allRegistrations
+            ->where('confirmed_reg', 'confirmed')
+            ->values();
 
-        $confirmedVirtualAttendees = (clone $confirmedRegistrations)
+        $confirmedVirtualAttendees = ConferenceRegistration::query()
             ->select(['fullname', 'email'])
+            ->where('confirmed_reg', 'confirmed')
             ->whereRaw('LOWER(TRIM(mode_of_participation)) = ?', ['virtual'])
             ->orderBy('fullname')
             ->get();
 
-        $groupCounts = function (string $field) use ($registrations) {
-            return $registrations
-                ->map(function ($registration) use ($field) {
-                    $value = trim((string) $registration->{$field});
+        $buildAnalytics = function ($registrations) {
+            $groupCounts = function (string $field) use ($registrations) {
+                return $registrations
+                    ->map(function ($registration) use ($field) {
+                        $value = trim((string) $registration->{$field});
 
-                    return $value === '' ? 'Not specified' : ucfirst(strtolower($value));
-                })
-                ->countBy()
-                ->sortDesc()
-                ->all();
+                        return $value === '' ? 'Not specified' : ucfirst(strtolower($value));
+                    })
+                    ->countBy()
+                    ->sortDesc()
+                    ->all();
+            };
+
+            $virtualCount = $registrations->filter(function ($registration) {
+                return strtolower(trim((string) $registration->mode_of_participation)) === 'virtual';
+            })->count();
+
+            return [
+                'participation' => [
+                    'Virtual' => $virtualCount,
+                    'Physical' => $registrations->count() - $virtualCount,
+                ],
+                'gender' => $groupCounts('gender'),
+                'how_heard' => $groupCounts('how_heard'),
+                'marital_status' => $groupCounts('marital_status'),
+            ];
         };
 
-        $virtualCount = $registrations->filter(function ($registration) {
-            return strtolower(trim((string) $registration->mode_of_participation)) === 'virtual';
-        })->count();
-
-        $analytics = [
-            'participation' => [
-                'Virtual' => $virtualCount,
-                'Physical' => $registrations->count() - $virtualCount,
-            ],
-            'gender' => $groupCounts('gender'),
-            'how_heard' => $groupCounts('how_heard'),
-            'marital_status' => $groupCounts('marital_status'),
-        ];
-
         return view('analytics', [
-            'analytics' => $analytics,
-            'confirmedTotal' => $registrations->count(),
-            'registrationTotal' => ConferenceRegistration::count(),
+            'confirmedAnalytics' => $buildAnalytics($confirmedRegistrations),
+            'totalAnalytics' => $buildAnalytics($allRegistrations),
+            'confirmedTotal' => $confirmedRegistrations->count(),
+            'registrationTotal' => $allRegistrations->count(),
             'confirmedVirtualAttendees' => $confirmedVirtualAttendees,
         ]);
     }

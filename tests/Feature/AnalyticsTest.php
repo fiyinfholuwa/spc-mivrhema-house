@@ -60,10 +60,16 @@ test('analytics only includes confirmed attendees', function () {
             return $attendees->count() === 1
                 && $attendees->first()->email === 'virtual@example.com';
         })
-        ->assertViewHas('analytics', function (array $analytics) {
+        ->assertViewHas('confirmedAnalytics', function (array $analytics) {
             return $analytics['gender'] === ['Female' => 1, 'Male' => 1]
                 && $analytics['participation'] === ['Virtual' => 1, 'Physical' => 1]
                 && $analytics['how_heard'] === ['Friend' => 2]
                 && $analytics['marital_status'] === ['Single' => 2];
+        })
+        ->assertViewHas('totalAnalytics', function (array $analytics) {
+            return $analytics['gender'] === ['Male' => 2, 'Female' => 1]
+                && $analytics['participation'] === ['Virtual' => 2, 'Physical' => 1]
+                && $analytics['how_heard'] === ['Friend' => 2, 'Social media' => 1]
+                && $analytics['marital_status'] === ['Single' => 2, 'Married' => 1];
         });
 });

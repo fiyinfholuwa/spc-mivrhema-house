@@ -18,6 +18,11 @@
 <main class="page-shell">
     <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-end gap-3 mb-4"><div><div class="eyebrow mb-2">Audience insights</div><h1 class="page-title h2 mb-1">Registration analytics</h1><p class="text-secondary mb-0">Charts below show the breakdown of confirmed attendees.</p></div><div class="d-flex flex-wrap gap-2"><span class="total-pill"><i class="bi bi-people-fill"></i>{{ number_format($registrationTotal) }} total registrations</span><span class="total-pill"><i class="bi bi-person-check-fill"></i>{{ number_format($confirmedTotal) }} confirmed</span></div></div>
 
+    <ul class="nav nav-pills gap-2 mb-4" id="analytics-tabs" role="tablist">
+        <li class="nav-item" role="presentation"><button class="nav-link active" id="confirmed-tab" data-bs-toggle="pill" data-bs-target="#confirmed-pane" type="button" role="tab" aria-controls="confirmed-pane" aria-selected="true"><i class="bi bi-person-check me-2"></i>Confirmed statistics</button></li>
+        <li class="nav-item" role="presentation"><button class="nav-link" id="total-tab" data-bs-toggle="pill" data-bs-target="#total-pane" type="button" role="tab" aria-controls="total-pane" aria-selected="false"><i class="bi bi-people me-2"></i>Total registration statistics</button></li>
+    </ul>
+
     @php
         $findCount = function ($items, $wanted) {
             foreach ($items as $label => $count) {
@@ -25,40 +30,52 @@
             }
             return 0;
         };
-        $highlights = [
-            ['Virtual', $findCount($analytics['participation'], ['virtual', 'online']), 'camera-video', '#eeedff', '#514bc4'],
-            ['Physical', $findCount($analytics['participation'], ['physical', 'in person', 'onsite', 'on-site']), 'geo-alt', '#e8f8f1', '#087d55'],
-            ['Male', $findCount($analytics['gender'], 'male'), 'gender-male', '#e8f4ff', '#1675d1'],
-            ['Female', $findCount($analytics['gender'], 'female'), 'gender-female', '#ffebf5', '#c43577'],
-        ];
         $sections = [
             ['Participation mode', 'Virtual and physical attendance choices', 'participation', 'camera-video', ''],
             ['Gender', 'Gender distribution across registrations', 'gender', 'people', 'green'],
             ['How people heard', 'Every distinct discovery source submitted', 'how_heard', 'megaphone', 'orange'],
             ['Marital status', 'Submitted marital status breakdown', 'marital_status', 'heart', 'blue'],
         ];
+        $tabs = [
+            ['id' => 'confirmed', 'analytics' => $confirmedAnalytics, 'total' => $confirmedTotal, 'label' => 'confirmed attendees'],
+            ['id' => 'total', 'analytics' => $totalAnalytics, 'total' => $registrationTotal, 'label' => 'total registrations'],
+        ];
     @endphp
 
-    <div class="row g-3 mb-4">
-        @foreach($highlights as [$label,$count,$icon,$background,$color])
-            <div class="col-6 col-lg-3"><div class="summary"><div class="d-flex justify-content-between"><div class="summary-label">{{ $label }}</div><div class="summary-icon" style="background:{{ $background }};color:{{ $color }}"><i class="bi bi-{{ $icon }}"></i></div></div><div class="summary-value">{{ number_format($count) }}</div><div class="summary-note">{{ $confirmedTotal ? number_format(($count / $confirmedTotal) * 100, 1) : 0 }}% of confirmed attendees</div></div></div>
-        @endforeach
-    </div>
+    <div class="tab-content" id="analytics-tab-content">
+    @foreach($tabs as $tab)
+        @php
+            $analytics = $tab['analytics'];
+            $tabTotal = $tab['total'];
+            $highlights = [
+                ['Virtual', $findCount($analytics['participation'], ['virtual', 'online']), 'camera-video', '#eeedff', '#514bc4'],
+                ['Physical', $findCount($analytics['participation'], ['physical', 'in person', 'onsite', 'on-site']), 'geo-alt', '#e8f8f1', '#087d55'],
+                ['Male', $findCount($analytics['gender'], 'male'), 'gender-male', '#e8f4ff', '#1675d1'],
+                ['Female', $findCount($analytics['gender'], 'female'), 'gender-female', '#ffebf5', '#c43577'],
+            ];
+        @endphp
+        <div class="tab-pane fade {{ $tab['id'] === 'confirmed' ? 'show active' : '' }}" id="{{ $tab['id'] }}-pane" role="tabpanel" aria-labelledby="{{ $tab['id'] }}-tab" tabindex="0">
+            <div class="row g-3 mb-4">
+                @foreach($highlights as [$label,$count,$icon,$background,$color])
+                    <div class="col-6 col-lg-3"><div class="summary"><div class="d-flex justify-content-between"><div class="summary-label">{{ $label }}</div><div class="summary-icon" style="background:{{ $background }};color:{{ $color }}"><i class="bi bi-{{ $icon }}"></i></div></div><div class="summary-value">{{ number_format($count) }}</div><div class="summary-note">{{ $tabTotal ? number_format(($count / $tabTotal) * 100, 1) : 0 }}% of {{ $tab['label'] }}</div></div></div>
+                @endforeach
+            </div>
 
-    <div class="row g-4">
-        @foreach($sections as [$heading,$subtitle,$key,$icon,$colorClass])
-            <div class="col-12 col-lg-6"><section class="chart-card {{ $colorClass }}"><div class="d-flex align-items-start justify-content-between"><div><h2 class="chart-title">{{ $heading }}</h2><div class="chart-subtitle">{{ $subtitle }}</div></div><div class="summary-icon" style="background:#f2f3f7;color:#687386"><i class="bi bi-{{ $icon }}"></i></div></div>
-                @forelse($analytics[$key] as $label => $count)
-                    @php $percentage = $confirmedTotal ? ($count / $confirmedTotal) * 100 : 0; @endphp
-                    <div class="metric"><div class="metric-head"><span class="metric-label">{{ $label }}</span><span><span class="metric-number">{{ number_format($count) }}</span><span class="metric-percent">{{ number_format($percentage, 1) }}%</span></span></div><div class="track"><div class="bar" style="width:{{ $percentage }}%"></div></div></div>
-                @empty
-                    <div class="empty"><i class="bi bi-inbox fs-3 d-block mb-2"></i>No data available yet.</div>
-                @endforelse
-            </section></div>
-        @endforeach
-    </div>
+            <div class="row g-4">
+                @foreach($sections as [$heading,$subtitle,$key,$icon,$colorClass])
+                    <div class="col-12 col-lg-6"><section class="chart-card {{ $colorClass }}"><div class="d-flex align-items-start justify-content-between"><div><h2 class="chart-title">{{ $heading }}</h2><div class="chart-subtitle">{{ $subtitle }}</div></div><div class="summary-icon" style="background:#f2f3f7;color:#687386"><i class="bi bi-{{ $icon }}"></i></div></div>
+                        @forelse($analytics[$key] as $label => $count)
+                            @php $percentage = $tabTotal ? ($count / $tabTotal) * 100 : 0; @endphp
+                            <div class="metric"><div class="metric-head"><span class="metric-label">{{ $label }}</span><span><span class="metric-number">{{ number_format($count) }}</span><span class="metric-percent">{{ number_format($percentage, 1) }}%</span></span></div><div class="track"><div class="bar" style="width:{{ $percentage }}%"></div></div></div>
+                        @empty
+                            <div class="empty"><i class="bi bi-inbox fs-3 d-block mb-2"></i>No data available yet.</div>
+                        @endforelse
+                    </section></div>
+                @endforeach
+            </div>
 
-    <section class="chart-card mt-4">
+            @if($tab['id'] === 'confirmed')
+            <section class="chart-card mt-4">
         <div class="d-flex align-items-start justify-content-between mb-3">
             <div><h2 class="chart-title">Confirmed virtual attendees</h2><div class="chart-subtitle">Names and email addresses for confirmed online participants</div></div>
             <div class="summary-icon" style="background:#eeedff;color:#514bc4"><i class="bi bi-envelope-at"></i></div>
@@ -77,7 +94,12 @@
                 </table>
             </div>
         @endif
-    </section>
+            </section>
+            @endif
+        </div>
+    @endforeach
+    </div>
 </main>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
