@@ -38,15 +38,32 @@ test('analytics only includes confirmed attendees', function () {
         'confirmed_reg' => 'pending',
     ]);
 
+    ConferenceRegistration::create([
+        ...$registration,
+        'fullname' => 'Virtual Confirmed Attendee',
+        'gender' => 'male',
+        'phone' => '08033333333',
+        'email' => 'virtual@example.com',
+        'how_heard' => 'Friend',
+        'mode_of_participation' => 'virtual',
+        'marital_status' => 'single',
+        'confirmed_reg' => 'confirmed',
+    ]);
+
     $response = $this->actingAs(User::factory()->create())->get('/analytics');
 
     $response
         ->assertOk()
-        ->assertViewHas('total', 1)
+        ->assertViewHas('registrationTotal', 3)
+        ->assertViewHas('confirmedTotal', 2)
+        ->assertViewHas('confirmedVirtualAttendees', function ($attendees) {
+            return $attendees->count() === 1
+                && $attendees->first()->email === 'virtual@example.com';
+        })
         ->assertViewHas('analytics', function (array $analytics) {
-            return $analytics['gender'] === ['Female' => 1]
-                && $analytics['participation'] === ['Virtual' => 0, 'Physical' => 1]
-                && $analytics['how_heard'] === ['Friend' => 1]
-                && $analytics['marital_status'] === ['Single' => 1];
+            return $analytics['gender'] === ['Female' => 1, 'Male' => 1]
+                && $analytics['participation'] === ['Virtual' => 1, 'Physical' => 1]
+                && $analytics['how_heard'] === ['Friend' => 2]
+                && $analytics['marital_status'] === ['Single' => 2];
         });
 });

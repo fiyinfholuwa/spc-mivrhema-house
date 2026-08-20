@@ -16,7 +16,7 @@
 <header class="topbar"><div class="container-fluid px-3 px-md-4 py-3 d-flex align-items-center justify-content-between"><div class="d-flex align-items-center gap-3"><div class="brand-mark"><i class="bi bi-bar-chart-fill"></i></div><div><div class="fw-bold">SPC Analytics</div><div class="text-secondary small">Registration insights</div></div></div><a href="{{ route('dashboard') }}" class="soft-btn"><i class="bi bi-arrow-left me-md-2"></i><span class="top-label">Back to dashboard</span></a></div></header>
 
 <main class="page-shell">
-    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-end gap-3 mb-4"><div><div class="eyebrow mb-2">Confirmed audience insights</div><h1 class="page-title h2 mb-1">Confirmed attendee analytics</h1><p class="text-secondary mb-0">A clear breakdown of {{ number_format($total) }} confirmed attendees.</p></div><span class="total-pill"><i class="bi bi-person-check-fill"></i>{{ number_format($total) }} confirmed</span></div>
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-end gap-3 mb-4"><div><div class="eyebrow mb-2">Audience insights</div><h1 class="page-title h2 mb-1">Registration analytics</h1><p class="text-secondary mb-0">Charts below show the breakdown of confirmed attendees.</p></div><div class="d-flex flex-wrap gap-2"><span class="total-pill"><i class="bi bi-people-fill"></i>{{ number_format($registrationTotal) }} total registrations</span><span class="total-pill"><i class="bi bi-person-check-fill"></i>{{ number_format($confirmedTotal) }} confirmed</span></div></div>
 
     @php
         $findCount = function ($items, $wanted) {
@@ -41,7 +41,7 @@
 
     <div class="row g-3 mb-4">
         @foreach($highlights as [$label,$count,$icon,$background,$color])
-            <div class="col-6 col-lg-3"><div class="summary"><div class="d-flex justify-content-between"><div class="summary-label">{{ $label }}</div><div class="summary-icon" style="background:{{ $background }};color:{{ $color }}"><i class="bi bi-{{ $icon }}"></i></div></div><div class="summary-value">{{ number_format($count) }}</div><div class="summary-note">{{ $total ? number_format(($count / $total) * 100, 1) : 0 }}% of confirmed attendees</div></div></div>
+            <div class="col-6 col-lg-3"><div class="summary"><div class="d-flex justify-content-between"><div class="summary-label">{{ $label }}</div><div class="summary-icon" style="background:{{ $background }};color:{{ $color }}"><i class="bi bi-{{ $icon }}"></i></div></div><div class="summary-value">{{ number_format($count) }}</div><div class="summary-note">{{ $confirmedTotal ? number_format(($count / $confirmedTotal) * 100, 1) : 0 }}% of confirmed attendees</div></div></div>
         @endforeach
     </div>
 
@@ -49,7 +49,7 @@
         @foreach($sections as [$heading,$subtitle,$key,$icon,$colorClass])
             <div class="col-12 col-lg-6"><section class="chart-card {{ $colorClass }}"><div class="d-flex align-items-start justify-content-between"><div><h2 class="chart-title">{{ $heading }}</h2><div class="chart-subtitle">{{ $subtitle }}</div></div><div class="summary-icon" style="background:#f2f3f7;color:#687386"><i class="bi bi-{{ $icon }}"></i></div></div>
                 @forelse($analytics[$key] as $label => $count)
-                    @php $percentage = $total ? ($count / $total) * 100 : 0; @endphp
+                    @php $percentage = $confirmedTotal ? ($count / $confirmedTotal) * 100 : 0; @endphp
                     <div class="metric"><div class="metric-head"><span class="metric-label">{{ $label }}</span><span><span class="metric-number">{{ number_format($count) }}</span><span class="metric-percent">{{ number_format($percentage, 1) }}%</span></span></div><div class="track"><div class="bar" style="width:{{ $percentage }}%"></div></div></div>
                 @empty
                     <div class="empty"><i class="bi bi-inbox fs-3 d-block mb-2"></i>No data available yet.</div>
@@ -57,6 +57,27 @@
             </section></div>
         @endforeach
     </div>
+
+    <section class="chart-card mt-4">
+        <div class="d-flex align-items-start justify-content-between mb-3">
+            <div><h2 class="chart-title">Confirmed virtual attendees</h2><div class="chart-subtitle">Names and email addresses for confirmed online participants</div></div>
+            <div class="summary-icon" style="background:#eeedff;color:#514bc4"><i class="bi bi-envelope-at"></i></div>
+        </div>
+        @if($confirmedVirtualAttendees->isEmpty())
+            <div class="empty"><i class="bi bi-camera-video fs-3 d-block mb-2"></i>No confirmed virtual attendees yet.</div>
+        @else
+            <div class="table-responsive">
+                <table class="table align-middle mb-0">
+                    <thead><tr><th scope="col">Name</th><th scope="col">Email</th></tr></thead>
+                    <tbody>
+                        @foreach($confirmedVirtualAttendees as $attendee)
+                            <tr><td>{{ $attendee->fullname }}</td><td>{{ $attendee->email ?: 'No email provided' }}</td></tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            </div>
+        @endif
+    </section>
 </main>
 </body>
 </html>

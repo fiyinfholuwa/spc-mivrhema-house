@@ -150,12 +150,19 @@ class FrontendController extends Controller
 
     public function analytics()
     {
-        $registrations = ConferenceRegistration::select([
+        $confirmedRegistrations = ConferenceRegistration::where('confirmed_reg', 'confirmed');
+        $registrations = (clone $confirmedRegistrations)->select([
             'mode_of_participation',
             'gender',
             'how_heard',
             'marital_status',
-        ])->where('confirmed_reg', 'confirmed')->get();
+        ])->get();
+
+        $confirmedVirtualAttendees = (clone $confirmedRegistrations)
+            ->select(['fullname', 'email'])
+            ->whereRaw('LOWER(TRIM(mode_of_participation)) = ?', ['virtual'])
+            ->orderBy('fullname')
+            ->get();
 
         $groupCounts = function (string $field) use ($registrations) {
             return $registrations
@@ -185,7 +192,9 @@ class FrontendController extends Controller
 
         return view('analytics', [
             'analytics' => $analytics,
-            'total' => $registrations->count(),
+            'confirmedTotal' => $registrations->count(),
+            'registrationTotal' => ConferenceRegistration::count(),
+            'confirmedVirtualAttendees' => $confirmedVirtualAttendees,
         ]);
     }
 
