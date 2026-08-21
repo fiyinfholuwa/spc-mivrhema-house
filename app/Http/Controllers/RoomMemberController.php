@@ -35,6 +35,7 @@ class RoomMemberController extends Controller
             ->get()
             ->map(fn (Room $room) => [
                 'type' => 'room',
+                'room_id' => $room->id,
                 'room_name' => $room->name,
                 'label' => $room->key_label,
                 'active_count' => $room->active_members_count,
@@ -50,6 +51,7 @@ class RoomMemberController extends Controller
             ->get()
             ->map(fn (RoomMember $member) => [
                 'type' => 'member',
+                'room_id' => $member->room_id,
                 'name' => $member->name,
                 'phone' => $member->phone,
                 'room_name' => $member->room->name,
