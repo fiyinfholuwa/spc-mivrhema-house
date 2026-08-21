@@ -51,7 +51,9 @@ Route::middleware('auth')->group(function () {
     Route::get('/room-members/search', [RoomMemberController::class, 'search'])->name('room-members.search');
     Route::get('/rooms/{room}/members', [RoomMemberController::class, 'index'])->name('room-members.index');
     Route::post('/rooms/{room}/members', [RoomMemberController::class, 'store'])->name('room-members.store');
+    Route::patch('/room-members/{member}', [RoomMemberController::class, 'update'])->name('room-members.update');
     Route::patch('/room-members/{member}/exit', [RoomMemberController::class, 'markExited'])->name('room-members.exit');
+    Route::patch('/room-members/{member}/restore', [RoomMemberController::class, 'restore'])->name('room-members.restore');
 });
 
 require __DIR__.'/auth.php';

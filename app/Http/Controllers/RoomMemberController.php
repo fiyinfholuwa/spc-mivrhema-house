@@ -82,7 +82,9 @@ class RoomMemberController extends Controller
                 'exited_at' => $member->exited_at?->format('M j, Y · g:i A'),
                 'recorded_by' => $member->recordedBy?->name ?? 'Deleted user',
                 'exited_by' => $member->exited_at ? ($member->exitedBy?->name ?? 'Deleted user') : null,
+                'update_url' => route('room-members.update', $member),
                 'exit_url' => route('room-members.exit', $member),
+                'restore_url' => route('room-members.restore', $member),
             ]),
         ]);
     }
@@ -122,6 +124,42 @@ class RoomMemberController extends Controller
         });
 
         $message = "{$member->name} marked as exited from {$member->room->name}.";
+
+        return $request->expectsJson()
+            ? response()->json(['message' => $message, 'room_id' => $member->room_id])
+            : back()->with('status', $message);
+    }
+
+    public function update(Request $request, RoomMember $member): RedirectResponse|JsonResponse
+    {
+        $data = $request->validate([
+            'name' => ['required', 'string', 'max:255'],
+            'phone' => ['required', 'string', 'max:30', 'regex:/^[0-9+()\-\s]+$/'],
+        ]);
+
+        $member->update($data);
+        $message = "{$member->name}'s details updated.";
+
+        return $request->expectsJson()
+            ? response()->json(['message' => $message, 'room_id' => $member->room_id])
+            : back()->with('status', $message);
+    }
+
+    public function restore(Request $request, RoomMember $member): RedirectResponse|JsonResponse
+    {
+        DB::transaction(function () use ($member) {
+            $lockedMember = RoomMember::query()->lockForUpdate()->findOrFail($member->id);
+            if (! $lockedMember->exited_at) {
+                throw ValidationException::withMessages(['member' => 'This room member is already active.']);
+            }
+
+            $lockedMember->update([
+                'exited_at' => null,
+                'exited_by' => null,
+            ]);
+        });
+
+        $message = "{$member->name} restored to {$member->room->name}.";
 
         return $request->expectsJson()
             ? response()->json(['message' => $message, 'room_id' => $member->room_id])

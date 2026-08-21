@@ -102,3 +102,44 @@ test('staff can search across rooms by member name or room number', function () 
         ->assertOk()
         ->assertJsonFragment(['type' => 'room', 'room_name' => 'Room 12']);
 });
+
+test('staff can edit a room member without replacing their record', function () {
+    $user = User::factory()->create();
+    $member = RoomMember::create([
+        'room_id' => Room::firstOrFail()->id,
+        'name' => 'Incorrect Name',
+        'phone' => '08011111111',
+        'checked_in_at' => now(),
+        'recorded_by' => $user->id,
+    ]);
+
+    $this->actingAs($user)->patchJson(route('room-members.update', $member), [
+        'name' => 'Correct Name',
+        'phone' => '08022222222',
+    ])->assertOk()->assertJson(['room_id' => $member->room_id]);
+
+    expect(RoomMember::count())->toBe(1)
+        ->and($member->refresh()->name)->toBe('Correct Name')
+        ->and($member->phone)->toBe('08022222222');
+});
+
+test('staff can restore an exited member to the room', function () {
+    $user = User::factory()->create();
+    $room = Room::firstOrFail();
+    $member = RoomMember::create([
+        'room_id' => $room->id,
+        'name' => 'Returning Member',
+        'phone' => '08011111111',
+        'checked_in_at' => now()->subDay(),
+        'exited_at' => now(),
+        'recorded_by' => $user->id,
+        'exited_by' => $user->id,
+    ]);
+
+    $this->actingAs($user)->patchJson(route('room-members.restore', $member))
+        ->assertOk()->assertJson(['room_id' => $room->id]);
+
+    expect($member->refresh()->exited_at)->toBeNull()
+        ->and($member->exited_by)->toBeNull()
+        ->and($room->activeMembers()->count())->toBe(1);
+});
