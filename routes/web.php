@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\FrontendController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\RoomKeyController;
 use Illuminate\Support\Facades\Route;
 
 
@@ -35,10 +36,17 @@ Route::post('/register-conference', [FrontendController::class, 'store'])->name(
 //})->middleware(['auth', 'verified'])->name('dashboard');
 
 Route::middleware('auth')->group(function () {
+    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
+    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
+    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
     Route::get('/dashboard', [FrontendController::class, 'showRegistrationsPage'])->name('dashboard');
     Route::get('/analytics', [FrontendController::class, 'analytics'])->name('analytics');
     Route::post('/confirm-arrival/{id}', [FrontendController::class, 'confirmArrival'])->name('confirm.arrival');
     Route::get('/get/feedback', [FrontendController::class, 'showRegistrationsPageFeedback'])->name('get.feedback');
+    Route::get('/room-keys', [RoomKeyController::class, 'index'])->name('room-keys.index');
+    Route::post('/room-keys/{room}/checkout', [RoomKeyController::class, 'checkout'])->name('room-keys.checkout');
+    Route::patch('/room-key-logs/{keyLog}/return', [RoomKeyController::class, 'returnKey'])->name('room-keys.return');
+    Route::get('/room-keys/{room}/history', [RoomKeyController::class, 'history'])->name('room-keys.history');
 });
 
 require __DIR__.'/auth.php';

@@ -26,6 +26,7 @@
     <div class="container-fluid px-3 px-md-4 py-3 d-flex align-items-center justify-content-between">
         <div class="d-flex align-items-center gap-3"><div class="brand-mark"><i class="bi bi-people-fill"></i></div><div><div class="fw-bold">SPC Admin</div><div class="subtext">Registration management</div></div></div>
         <div class="d-flex gap-2 top-actions">
+            <a href="{{ route('room-keys.index') }}" class="soft-btn text-decoration-none"><i class="bi bi-key me-md-2"></i><span class="label">Room Keys</span></a>
             <a href="{{ route('analytics') }}" class="soft-btn text-decoration-none"><i class="bi bi-bar-chart-line me-md-2"></i><span class="label">Analytics</span></a>
             <a href="{{ route('home') }}" class="soft-btn text-decoration-none"><i class="bi bi-globe2 me-md-2"></i><span class="label">Website</span></a>
             <a href="{{ route('get.feedback') }}" class="soft-btn text-decoration-none"><i class="bi bi-chat-left-text me-md-2"></i><span class="label">Feedback</span></a>
@@ -37,7 +38,10 @@
 <main class="page-shell">
     <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-end gap-3 mb-4">
         <div><div class="eyebrow mb-2">Conference overview</div><h1 class="page-title h2 mb-1">Registrations</h1><p class="text-secondary mb-0">Review attendees and confirm arrivals in real time.</p></div>
-        <button id="exportBtn" class="btn btn-dark rounded-3 px-3 py-2"><i class="bi bi-download me-2"></i>Export current results</button>
+        <div class="d-flex flex-wrap gap-2">
+            <a href="{{ route('room-keys.index') }}" class="btn btn-primary rounded-3 px-3 py-2"><i class="bi bi-key-fill me-2"></i>Manage room keys</a>
+            <button id="exportBtn" class="btn btn-dark rounded-3 px-3 py-2"><i class="bi bi-download me-2"></i>Export current results</button>
+        </div>
     </div>
 
     @php
