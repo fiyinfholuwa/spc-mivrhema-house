@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\ConferenceRegistration;
 use App\Models\Room;
 use App\Models\RoomKeyLog;
 use App\Models\RoomMember;
@@ -23,8 +24,12 @@ class RoomKeyController extends Controller
             ->orderBy('id')
             ->get();
         $activeMemberCount = RoomMember::whereNull('exited_at')->count();
+        $confirmedRegistrations = ConferenceRegistration::query()
+            ->where('confirmed_reg', 'confirmed')
+            ->orderBy('fullname')
+            ->get(['id', 'fullname', 'phone']);
 
-        return view('room-keys.index', compact('rooms', 'activeMemberCount'));
+        return view('room-keys.index', compact('rooms', 'activeMemberCount', 'confirmedRegistrations'));
     }
 
     public function checkout(Request $request, Room $room): RedirectResponse|JsonResponse
