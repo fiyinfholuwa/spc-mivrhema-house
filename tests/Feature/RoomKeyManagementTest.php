@@ -189,13 +189,12 @@ test('manual return can be recorded without a digital collection', function () {
 
     $this->actingAs($user)->postJson(route('room-keys.checkout', $room), [
         'activity_type' => 'returned_manual',
-        'returned_at' => now()->subHour()->format('Y-m-d H:i:s'),
         'returner_name' => 'Paper Register Returner',
-        'returner_phone' => '08044444444',
     ])->assertOk();
 
     $log = $room->keyLogs()->firstOrFail();
     expect($log->collector_name)->toBeNull()
         ->and($log->returner_name)->toBe('Paper Register Returner')
+        ->and($log->returned_at)->not->toBeNull()
         ->and($room->fresh()->activeKeyLog)->toBeNull();
 });

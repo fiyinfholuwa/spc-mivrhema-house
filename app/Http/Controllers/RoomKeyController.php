@@ -29,11 +29,11 @@ class RoomKeyController extends Controller
             'checkout_note' => ['nullable', 'string', 'max:1000'],
             'activity_type' => ['nullable', 'in:collected,completed,returned_manual'],
             'collected_at' => ['nullable', 'required_if:activity_type,completed', 'date', 'before_or_equal:now'],
-            'returned_at' => ['nullable', Rule::requiredIf(in_array($request->input('activity_type'), ['completed', 'returned_manual'], true)), 'date', 'after_or_equal:collected_at', 'before_or_equal:now'],
+            'returned_at' => ['nullable', 'required_if:activity_type,completed', 'date', 'after_or_equal:collected_at', 'before_or_equal:now'],
             'return_note' => ['nullable', 'string', 'max:1000'],
             'same_returner' => ['nullable', 'boolean'],
-            'returner_name' => [Rule::excludeIf($request->boolean('same_returner')), 'nullable', Rule::requiredIf(in_array($request->input('activity_type'), ['completed', 'returned_manual'], true)), 'string', 'max:255'],
-            'returner_phone' => [Rule::excludeIf($request->boolean('same_returner')), 'nullable', Rule::requiredIf(in_array($request->input('activity_type'), ['completed', 'returned_manual'], true)), 'string', 'max:30', 'regex:/^[0-9+()\-\s]+$/'],
+            'returner_name' => [Rule::excludeIf($request->boolean('same_returner') && $request->input('activity_type') === 'completed'), 'nullable', Rule::requiredIf(in_array($request->input('activity_type'), ['completed', 'returned_manual'], true)), 'string', 'max:255'],
+            'returner_phone' => [Rule::excludeIf($request->boolean('same_returner') && $request->input('activity_type') === 'completed'), 'nullable', Rule::requiredIf($request->input('activity_type') === 'completed'), 'string', 'max:30', 'regex:/^[0-9+()\-\s]+$/'],
         ]);
 
         DB::transaction(function () use ($room, $data, $request) {
@@ -50,9 +50,9 @@ class RoomKeyController extends Controller
                 'checkout_note' => $data['checkout_note'] ?? null,
                 'collected_at' => $activityType === 'returned_manual' ? null : ($data['collected_at'] ?? now()),
                 'checked_out_by' => $request->user()->id,
-                'returned_at' => $completed ? $data['returned_at'] : null,
+                'returned_at' => $completed ? ($data['returned_at'] ?? now()) : null,
                 'returner_name' => $completed ? ($sameReturner ? $data['collector_name'] : $data['returner_name']) : null,
-                'returner_phone' => $completed ? ($sameReturner ? $data['collector_phone'] : $data['returner_phone']) : null,
+                'returner_phone' => $completed ? ($sameReturner ? $data['collector_phone'] : ($data['returner_phone'] ?? null)) : null,
                 'returned_by' => $completed ? $request->user()->id : null,
                 'return_note' => $completed ? ($data['return_note'] ?? null) : null,
             ]);
