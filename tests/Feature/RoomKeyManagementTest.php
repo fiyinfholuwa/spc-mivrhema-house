@@ -21,8 +21,8 @@ test('room cards display their activity log count', function () {
 
     $this->actingAs($user)->get(route('room-keys.index'))
         ->assertOk()
-        ->assertSee('View all activity')
-        ->assertSee('>1</span>', false);
+        ->assertSee('View activity log')
+        ->assertSee('>1</button>', false);
 });
 
 test('migration creates twenty five rooms and an overflow', function () {
