@@ -182,3 +182,20 @@ test('staff can manually log an earlier return time', function () {
 
     expect($log->refresh()->returned_at->format('Y-m-d H:i'))->toBe($returnedAt->format('Y-m-d H:i'));
 });
+
+test('manual return can be recorded without a digital collection', function () {
+    $user = User::factory()->create();
+    $room = Room::firstOrFail();
+
+    $this->actingAs($user)->postJson(route('room-keys.checkout', $room), [
+        'activity_type' => 'returned_manual',
+        'returned_at' => now()->subHour()->format('Y-m-d H:i:s'),
+        'returner_name' => 'Paper Register Returner',
+        'returner_phone' => '08044444444',
+    ])->assertOk();
+
+    $log = $room->keyLogs()->firstOrFail();
+    expect($log->collector_name)->toBeNull()
+        ->and($log->returner_name)->toBe('Paper Register Returner')
+        ->and($room->fresh()->activeKeyLog)->toBeNull();
+});
