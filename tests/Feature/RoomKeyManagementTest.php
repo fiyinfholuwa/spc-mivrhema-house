@@ -8,6 +8,23 @@ test('room key register requires authentication', function () {
     $this->get(route('room-keys.index'))->assertRedirect(route('login'));
 });
 
+test('room cards display their activity log count', function () {
+    $user = User::factory()->create();
+    $room = Room::firstOrFail();
+    RoomKeyLog::create([
+        'room_id' => $room->id,
+        'collector_name' => 'Counted Collector',
+        'collector_phone' => '08012345678',
+        'collected_at' => now(),
+        'checked_out_by' => $user->id,
+    ]);
+
+    $this->actingAs($user)->get(route('room-keys.index'))
+        ->assertOk()
+        ->assertSee('View all activity')
+        ->assertSee('>1</span>', false);
+});
+
 test('migration creates twenty five rooms and an overflow', function () {
     expect(Room::count())->toBe(26)
         ->and(Room::where('is_overflow', true)->value('name'))->toBe('Overflow');

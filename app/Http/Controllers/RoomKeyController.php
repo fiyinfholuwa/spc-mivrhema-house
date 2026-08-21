@@ -16,7 +16,7 @@ class RoomKeyController extends Controller
 {
     public function index(): View
     {
-        $rooms = Room::with('activeKeyLog')->orderBy('is_overflow')->orderBy('id')->get();
+        $rooms = Room::with('activeKeyLog')->withCount('keyLogs')->orderBy('is_overflow')->orderBy('id')->get();
 
         return view('room-keys.index', compact('rooms'));
     }
