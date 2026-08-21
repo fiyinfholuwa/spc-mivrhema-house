@@ -160,3 +160,25 @@ test('staff can record a different person returning the key', function () {
     expect($log->refresh()->returner_name)->toBe('Different Returner')
         ->and($log->returner_phone)->toBe('08022222222');
 });
+
+test('staff can manually log an earlier return time', function () {
+    $user = User::factory()->create();
+    $room = Room::firstOrFail();
+    $log = RoomKeyLog::create([
+        'room_id' => $room->id,
+        'collector_name' => 'Collector',
+        'collector_phone' => '08011111111',
+        'collected_at' => now()->subDay(),
+        'checked_out_by' => $user->id,
+    ]);
+    $returnedAt = now()->subHours(4)->startOfMinute();
+
+    $this->actingAs($user)->patchJson(route('room-keys.return', $log), [
+        'activity_type' => 'returned_manual',
+        'returned_at' => $returnedAt->format('Y-m-d H:i:s'),
+        'returner_name' => 'Manual Returner',
+        'returner_phone' => '08033333333',
+    ])->assertOk();
+
+    expect($log->refresh()->returned_at->format('Y-m-d H:i'))->toBe($returnedAt->format('Y-m-d H:i'));
+});

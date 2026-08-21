@@ -69,6 +69,8 @@ class RoomKeyController extends Controller
     {
         $data = $request->validate([
             'return_note' => ['nullable', 'string', 'max:1000'],
+            'activity_type' => ['nullable', 'in:returned,returned_manual'],
+            'returned_at' => ['nullable', 'required_if:activity_type,returned_manual', 'date', 'before_or_equal:now'],
             'same_returner' => ['nullable', 'boolean'],
             'returner_name' => [Rule::requiredIf(! $request->boolean('same_returner')), 'nullable', 'string', 'max:255'],
             'returner_phone' => [Rule::requiredIf(! $request->boolean('same_returner')), 'nullable', 'string', 'max:30', 'regex:/^[0-9+()\-\s]+$/'],
@@ -79,7 +81,7 @@ class RoomKeyController extends Controller
                 throw ValidationException::withMessages(['room' => 'This key has already been returned.']);
             }
             $log->update([
-                'returned_at' => now(),
+                'returned_at' => $data['returned_at'] ?? now(),
                 'returner_name' => ($data['same_returner'] ?? false) ? $log->collector_name : $data['returner_name'],
                 'returner_phone' => ($data['same_returner'] ?? false) ? $log->collector_phone : $data['returner_phone'],
                 'returned_by' => $request->user()->id,

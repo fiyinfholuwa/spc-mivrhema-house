@@ -472,6 +472,12 @@
             </div>
         @endif
 
+        @if (session('session_error'))
+            <div class="alert alert-danger" role="alert">
+                <i class="fas fa-clock me-2"></i>{{ session('session_error') }}
+            </div>
+        @endif
+
         <form method="POST" action="{{ route('login') }}">
             @csrf
 
