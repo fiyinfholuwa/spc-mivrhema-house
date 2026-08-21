@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Room;
 use App\Models\RoomKeyLog;
+use App\Models\RoomMember;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -16,9 +17,14 @@ class RoomKeyController extends Controller
 {
     public function index(): View
     {
-        $rooms = Room::with('activeKeyLog')->withCount('keyLogs')->orderBy('is_overflow')->orderBy('id')->get();
+        $rooms = Room::with('activeKeyLog')
+            ->withCount(['keyLogs', 'members', 'activeMembers'])
+            ->orderBy('is_overflow')
+            ->orderBy('id')
+            ->get();
+        $activeMemberCount = RoomMember::whereNull('exited_at')->count();
 
-        return view('room-keys.index', compact('rooms'));
+        return view('room-keys.index', compact('rooms', 'activeMemberCount'));
     }
 
     public function checkout(Request $request, Room $room): RedirectResponse|JsonResponse

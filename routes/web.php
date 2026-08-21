@@ -3,6 +3,7 @@
 use App\Http\Controllers\FrontendController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\RoomKeyController;
+use App\Http\Controllers\RoomMemberController;
 use Illuminate\Support\Facades\Route;
 
 
@@ -47,6 +48,10 @@ Route::middleware('auth')->group(function () {
     Route::post('/room-keys/{room}/checkout', [RoomKeyController::class, 'checkout'])->name('room-keys.checkout');
     Route::patch('/room-key-logs/{keyLog}/return', [RoomKeyController::class, 'returnKey'])->name('room-keys.return');
     Route::get('/room-keys/{room}/history', [RoomKeyController::class, 'history'])->name('room-keys.history');
+    Route::get('/room-members/search', [RoomMemberController::class, 'search'])->name('room-members.search');
+    Route::get('/rooms/{room}/members', [RoomMemberController::class, 'index'])->name('room-members.index');
+    Route::post('/rooms/{room}/members', [RoomMemberController::class, 'store'])->name('room-members.store');
+    Route::patch('/room-members/{member}/exit', [RoomMemberController::class, 'markExited'])->name('room-members.exit');
 });
 
 require __DIR__.'/auth.php';

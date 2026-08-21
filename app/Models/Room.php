@@ -24,4 +24,14 @@ class Room extends Model
     {
         return $this->hasOne(RoomKeyLog::class)->whereNull('returned_at')->latestOfMany('collected_at');
     }
+
+    public function members(): HasMany
+    {
+        return $this->hasMany(RoomMember::class);
+    }
+
+    public function activeMembers(): HasMany
+    {
+        return $this->members()->whereNull('exited_at');
+    }
 }
