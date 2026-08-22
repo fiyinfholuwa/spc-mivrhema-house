@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\ConferenceRegistration;
 use App\Models\SpecialAccommodation;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
@@ -25,37 +26,63 @@ class SpecialAccommodationController extends Controller
             ->paginate(15)
             ->withQueryString();
 
-        $confirmedRegistrations = ConferenceRegistration::query()
-            ->where('confirmed_reg', 'confirmed')
-            ->whereNotIn('id', SpecialAccommodation::query()->select('conference_registration_id')->whereNotNull('conference_registration_id'))
-            ->orderBy('fullname')
-            ->get(['id', 'fullname', 'phone']);
-
-        return view('special-accommodations.index', compact('entries', 'confirmedRegistrations', 'search'));
+        return view('special-accommodations.index', compact('entries', 'search'));
     }
 
-    public function store(Request $request): RedirectResponse
+    public function registrationSearch(Request $request): JsonResponse
+    {
+        $data = $request->validate(['q' => ['required', 'string', 'min:2', 'max:255']]);
+        $term = trim($data['q']);
+
+        $registrations = ConferenceRegistration::query()
+            ->where('confirmed_reg', 'confirmed')
+            ->whereNotIn('id', SpecialAccommodation::query()
+                ->select('conference_registration_id')
+                ->whereNotNull('conference_registration_id'))
+            ->where(fn ($query) => $query
+                ->where('fullname', 'like', "%{$term}%")
+                ->orWhere('phone', 'like', "%{$term}%"))
+            ->orderBy('fullname')
+            ->limit(12)
+            ->get(['id', 'fullname', 'phone']);
+
+        return response()->json(['results' => $registrations]);
+    }
+
+    public function store(Request $request): RedirectResponse|JsonResponse
     {
         $data = $this->validated($request);
         $data['created_by'] = $request->user()->id;
         SpecialAccommodation::create($data);
 
-        return back()->with('status', "{$data['name']} added to special accommodation.");
+        $message = "{$data['name']} added to special accommodation.";
+
+        return $request->expectsJson()
+            ? response()->json(['message' => $message], 201)
+            : back()->with('status', $message);
     }
 
-    public function update(Request $request, SpecialAccommodation $specialAccommodation): RedirectResponse
+    public function update(Request $request, SpecialAccommodation $specialAccommodation): RedirectResponse|JsonResponse
     {
         $specialAccommodation->update($this->validated($request, $specialAccommodation));
 
-        return back()->with('status', "{$specialAccommodation->name}'s details were updated.");
+        $message = "{$specialAccommodation->name}'s details were updated.";
+
+        return $request->expectsJson()
+            ? response()->json(['message' => $message])
+            : back()->with('status', $message);
     }
 
-    public function destroy(SpecialAccommodation $specialAccommodation): RedirectResponse
+    public function destroy(Request $request, SpecialAccommodation $specialAccommodation): RedirectResponse|JsonResponse
     {
         $name = $specialAccommodation->name;
         $specialAccommodation->delete();
 
-        return back()->with('status', "{$name} removed from special accommodation.");
+        $message = "{$name} removed from special accommodation.";
+
+        return $request->expectsJson()
+            ? response()->json(['message' => $message])
+            : back()->with('status', $message);
     }
 
     private function validated(Request $request, ?SpecialAccommodation $entry = null): array

@@ -55,6 +55,7 @@ Route::middleware('auth')->group(function () {
     Route::patch('/room-members/{member}', [RoomMemberController::class, 'update'])->name('room-members.update');
     Route::patch('/room-members/{member}/exit', [RoomMemberController::class, 'markExited'])->name('room-members.exit');
     Route::patch('/room-members/{member}/restore', [RoomMemberController::class, 'restore'])->name('room-members.restore');
+    Route::get('/special-accommodations/registration-search', [SpecialAccommodationController::class, 'registrationSearch'])->name('special-accommodations.registration-search');
     Route::resource('special-accommodations', SpecialAccommodationController::class)->only(['index', 'store', 'update', 'destroy']);
 });
 

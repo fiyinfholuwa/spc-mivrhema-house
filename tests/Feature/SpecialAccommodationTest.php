@@ -81,3 +81,38 @@ test('only confirmed registrations can be selected', function () {
 
     $this->assertDatabaseCount('special_accommodations', 0);
 });
+
+test('staff can search available confirmed registrations by name or phone', function () {
+    $user = User::factory()->create();
+    $available = registration(['fullname' => 'Searchable Person', 'phone' => '08055551234', 'confirmed_reg' => 'confirmed']);
+    registration(['fullname' => 'Pending Person', 'phone' => '08055559999', 'confirmed_reg' => 'pending']);
+
+    $this->actingAs($user)
+        ->getJson(route('special-accommodations.registration-search', ['q' => '555512']))
+        ->assertOk()
+        ->assertJsonPath('results.0.id', $available->id)
+        ->assertJsonCount(1, 'results');
+
+    SpecialAccommodation::create([
+        'conference_registration_id' => $available->id,
+        'name' => $available->fullname,
+        'phone' => $available->phone,
+        'created_by' => $user->id,
+    ]);
+
+    $this->actingAs($user)
+        ->getJson(route('special-accommodations.registration-search', ['q' => 'Searchable']))
+        ->assertOk()
+        ->assertJsonCount(0, 'results');
+});
+
+test('ajax accommodation changes return json', function () {
+    $user = User::factory()->create();
+
+    $response = $this->actingAs($user)->postJson(route('special-accommodations.store'), [
+        'name' => 'Manual Guest',
+        'phone' => '08012345678',
+    ]);
+
+    $response->assertCreated()->assertJsonPath('message', 'Manual Guest added to special accommodation.');
+});
