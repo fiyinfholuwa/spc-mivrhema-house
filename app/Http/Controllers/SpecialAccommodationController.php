@@ -19,6 +19,7 @@ class SpecialAccommodationController extends Controller
             ->when($search, fn ($query) => $query->where(fn ($query) => $query
                 ->where('name', 'like', "%{$search}%")
                 ->orWhere('phone', 'like', "%{$search}%")
+                ->orWhere('possible_departure_at', 'like', "%{$search}%")
                 ->orWhere('notes', 'like', "%{$search}%")))
             ->latest()
             ->paginate(15)
