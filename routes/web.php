@@ -4,6 +4,7 @@ use App\Http\Controllers\FrontendController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\RoomKeyController;
 use App\Http\Controllers\RoomMemberController;
+use App\Http\Controllers\SpecialAccommodationController;
 use Illuminate\Support\Facades\Route;
 
 
@@ -54,6 +55,7 @@ Route::middleware('auth')->group(function () {
     Route::patch('/room-members/{member}', [RoomMemberController::class, 'update'])->name('room-members.update');
     Route::patch('/room-members/{member}/exit', [RoomMemberController::class, 'markExited'])->name('room-members.exit');
     Route::patch('/room-members/{member}/restore', [RoomMemberController::class, 'restore'])->name('room-members.restore');
+    Route::resource('special-accommodations', SpecialAccommodationController::class)->only(['index', 'store', 'update', 'destroy']);
 });
 
 require __DIR__.'/auth.php';

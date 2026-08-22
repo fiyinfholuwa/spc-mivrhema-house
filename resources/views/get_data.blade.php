@@ -26,6 +26,7 @@
     <div class="container-fluid px-3 px-md-4 py-3 d-flex align-items-center justify-content-between">
         <div class="d-flex align-items-center gap-3"><div class="brand-mark"><i class="bi bi-people-fill"></i></div><div><div class="fw-bold">SPC Admin</div><div class="subtext">Registration management</div></div></div>
         <div class="d-flex gap-2 top-actions">
+            <a href="{{ route('special-accommodations.index') }}" class="soft-btn text-decoration-none"><i class="bi bi-stars me-md-2"></i><span class="label">Special Accommodation</span></a>
             <a href="{{ route('room-keys.index') }}" class="soft-btn text-decoration-none"><i class="bi bi-key me-md-2"></i><span class="label">Room Keys</span></a>
             <a href="{{ route('analytics') }}" class="soft-btn text-decoration-none"><i class="bi bi-bar-chart-line me-md-2"></i><span class="label">Analytics</span></a>
             <a href="{{ route('home') }}" class="soft-btn text-decoration-none"><i class="bi bi-globe2 me-md-2"></i><span class="label">Website</span></a>
